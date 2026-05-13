@@ -3,53 +3,55 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>මගේ පළමු ඇප් එක</title>
+    <title>Nexora AI Pro App</title>
     <style>
-        /* ඇප් එක ලස්සන කරන කොටස (CSS) */
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f0f2f5;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-        }
-        .app-card {
-            background: white;
-            padding: 30px;
-            border-radius: 20px;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
-            text-align: center;
-            width: 80%;
-            max-width: 300px;
-        }
-        h1 { color: #1c1e21; }
-        button {
-            background-color: #007bff;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 10px;
-            font-size: 16px;
-            cursor: pointer;
-        }
+        body { font-family: sans-serif; background: #000; color: white; text-align: center; margin: 0; padding: 20px; }
+        .login-box { background: #111; padding: 30px; border-radius: 20px; border: 1px solid #007bff; margin-top: 50px; }
+        input { width: 80%; padding: 12px; margin: 15px 0; border-radius: 10px; border: none; }
+        .btn { background: #007bff; color: white; padding: 12px 30px; border: none; border-radius: 10px; cursor: pointer; width: 100%; font-size: 16px; }
+        
+        #main-app { display: none; }
+        .feature-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; }
+        .f-btn { background: #1a1a1a; padding: 20px; border-radius: 15px; border: 1px solid #333; text-decoration: none; color: white; font-size: 14px; }
+        .f-btn:active { background: #007bff; }
+        .banner { width: 100%; border-radius: 15px; margin-bottom: 20px; border: 1px solid #007bff; }
+        .user-hi { color: #00c6ff; font-size: 22px; margin-bottom: 20px; }
     </style>
 </head>
 <body>
 
-    <div class="app-card">
-        <h1>ආයුබෝවන්!</h1>
-        <p>මම පන්සිළු. මෙය මම ෆෝන් එකෙන්ම හැදූ මගේ පළමු ඇප් එකයි.</p>
-        <button onclick="showMessage()">මාව ඔබන්න</button>
+    <audio id="bgMusic" loop><source src="parano.mp3" type="audio/mpeg"></audio>
+
+    <div id="login-screen" class="login-box">
+        <h2>Nexora Lab AI</h2>
+        <input type="text" id="uname" placeholder="ඔබේ නම ලියන්න...">
+        <button class="btn" onclick="startApp()">Start App</button>
+    </div>
+
+    <div id="main-app">
+        <div class="user-hi" id="disp-name">ආයුබෝවන්!</div>
+        <img src="profile.jpg" class="banner" alt="Nexora Banner">
+        
+        <div class="feature-grid">
+            <a href="#" class="f-btn">🤖 AI Knowledge</a>
+            <a href="#" class="f-btn">📄 Images to PDF</a>
+            <a href="#" class="f-btn">🎵 Search Songs</a>
+            <a href="#" class="f-btn">🔒 Private Vault</a>
+            <a href="https://youtube.com/@nexoralab-y8j" class="f-btn" style="grid-column: span 2;">📺 Nexora YouTube</a>
+        </div>
+        <p style="font-size: 10px; color: #444; margin-top: 30px;">Developed by Pansilu</p>
     </div>
 
     <script>
-        /* ඇප් එකේ වැඩ කෑලි (JavaScript) */
-        function showMessage() {
-            alert("සුභ පැතුම්! ඔයා සාර්ථකව ඇප් එකේ පළමු පියවර අවසන් කළා.");
+        function startApp() {
+            let n = document.getElementById("uname").value;
+            if(n.trim() !== "") {
+                document.getElementById("bgMusic").play();
+                document.getElementById("login-screen").style.display = "none";
+                document.getElementById("main-app").style.display = "block";
+                document.getElementById("disp-name").innerText = "ආයුබෝවන්, " + n + "!";
+            } else { alert("නම ඇතුළත් කරන්න!"); }
         }
     </script>
-
 </body>
 </html>
