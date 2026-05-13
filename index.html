@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="si">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>මගේ පළමු ඇප් එක</title>
+    <style>
+        /* ඇප් එක ලස්සන කරන කොටස (CSS) */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .app-card {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            text-align: center;
+            width: 80%;
+            max-width: 300px;
+        }
+        h1 { color: #1c1e21; }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-card">
+        <h1>ආයුබෝවන්!</h1>
+        <p>මම පන්සිළු. මෙය මම ෆෝන් එකෙන්ම හැදූ මගේ පළමු ඇප් එකයි.</p>
+        <button onclick="showMessage()">මාව ඔබන්න</button>
+    </div>
+
+    <script>
+        /* ඇප් එකේ වැඩ කෑලි (JavaScript) */
+        function showMessage() {
+            alert("සුභ පැතුම්! ඔයා සාර්ථකව ඇප් එකේ පළමු පියවර අවසන් කළා.");
+        }
+    </script>
+
+</body>
+</html>
