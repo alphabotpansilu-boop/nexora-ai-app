@@ -3,43 +3,56 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nexora AI Pro App</title>
+    <title>Nexora AI Pro</title>
     <style>
-        body { font-family: sans-serif; background: #000; color: white; text-align: center; margin: 0; padding: 20px; }
-        .login-box { background: #111; padding: 30px; border-radius: 20px; border: 1px solid #007bff; margin-top: 50px; }
-        input { width: 80%; padding: 12px; margin: 15px 0; border-radius: 10px; border: none; }
-        .btn { background: #007bff; color: white; padding: 12px 30px; border: none; border-radius: 10px; cursor: pointer; width: 100%; font-size: 16px; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #0b0e14; color: white; text-align: center; margin: 0; padding: 20px; }
+        .container { max-width: 500px; margin: auto; }
+        .login-box, .vault-box { background: #1a1f29; padding: 30px; border-radius: 20px; border: 1px solid #00d2ff; margin-top: 50px; }
+        input { width: 85%; padding: 12px; margin: 15px 0; border-radius: 10px; border: none; background: #2d3545; color: white; }
+        .btn { background: linear-gradient(45deg, #00d2ff, #3a7bd5); color: white; padding: 12px; border: none; border-radius: 10px; cursor: pointer; width: 90%; font-weight: bold; }
         
-        #main-app { display: none; }
+        #main-app, #vault-content { display: none; }
         .feature-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; }
-        .f-btn { background: #1a1a1a; padding: 20px; border-radius: 15px; border: 1px solid #333; text-decoration: none; color: white; font-size: 14px; }
-        .f-btn:active { background: #007bff; }
-        .banner { width: 100%; border-radius: 15px; margin-bottom: 20px; border: 1px solid #007bff; }
-        .user-hi { color: #00c6ff; font-size: 22px; margin-bottom: 20px; }
+        .f-btn { background: #1a1f29; padding: 20px; border-radius: 15px; border: 1px solid #333; text-decoration: none; color: white; font-size: 14px; transition: 0.3s; }
+        .f-btn:hover { border-color: #00d2ff; transform: scale(1.05); }
+        .banner { width: 100%; border-radius: 15px; margin-bottom: 20px; border: 1px solid #00d2ff; }
+        h2 { color: #00d2ff; }
     </style>
 </head>
 <body>
 
     <audio id="bgMusic" loop><source src="parano.mp3" type="audio/mpeg"></audio>
 
-    <div id="login-screen" class="login-box">
-        <h2>Nexora Lab AI</h2>
-        <input type="text" id="uname" placeholder="ඔබේ නම ලියන්න...">
-        <button class="btn" onclick="startApp()">Start App</button>
+    <div id="login-screen" class="login-box container">
+        <h2>Nexora Pro</h2>
+        <p>ඇප් එකට ඇතුළු වීමට නම ලියන්න</p>
+        <input type="text" id="uname" placeholder="ඔබේ නම...">
+        <button class="btn" onclick="startApp()">START APP</button>
     </div>
 
-    <div id="main-app">
-        <div class="user-hi" id="disp-name">ආයුබෝවන්!</div>
+    <div id="main-app" class="container">
+        <h3 id="disp-name">ආයුබෝවන්!</h3>
         <img src="profile.jpg" class="banner" alt="Nexora Banner">
         
         <div class="feature-grid">
-            <a href="#" class="f-btn">🤖 AI Knowledge</a>
-            <a href="#" class="f-btn">📄 Images to PDF</a>
-            <a href="#" class="f-btn">🎵 Search Songs</a>
-            <a href="#" class="f-btn">🔒 Private Vault</a>
-            <a href="https://youtube.com/@nexoralab-y8j" class="f-btn" style="grid-column: span 2;">📺 Nexora YouTube</a>
+            <a href="https://gemini.google.com/" target="_blank" class="f-btn">🤖 Gemini AI Chat</a>
+            <a href="https://www.ilovepdf.com/jpg_to_pdf" target="_blank" class="f-btn">📄 Images to PDF</a>
+            <a href="https://www.y2mate.com/" target="_blank" class="f-btn">🎵 Search & Download Songs</a>
+            <a href="#" onclick="showVault()" class="f-btn">🔒 Private Vault</a>
+            <a href="https://youtube.com/@nexoralab-y8j" target="_blank" class="f-btn" style="grid-column: span 2;">📺 Nexora YouTube Channel</a>
         </div>
-        <p style="font-size: 10px; color: #444; margin-top: 30px;">Developed by Pansilu</p>
+    </div>
+
+    <div id="vault-screen" class="vault-box container" style="display:none;">
+        <h2>Private Vault</h2>
+        <p>මුරපදය (Password) ඇතුළත් කරන්න</p>
+        <input type="password" id="vaultPass" placeholder="Password එක ගහන්න...">
+        <button class="btn" onclick="checkVault()">Unlock</button>
+        <button class="btn" onclick="backToMain()" style="margin-top:10px; background:gray;">Back</button>
+        
+        <div id="vault-content" style="margin-top:20px; color:#00ff00;">
+            <p>සාර්ථකයි! මෙතැන ඔයාගේ රහස් ලින්ක් හෝ තොරතුරු දාන්න පුළුවන්.</p>
+        </div>
     </div>
 
     <script>
@@ -50,8 +63,29 @@
                 document.getElementById("login-screen").style.display = "none";
                 document.getElementById("main-app").style.display = "block";
                 document.getElementById("disp-name").innerText = "ආයුබෝවන්, " + n + "!";
-            } else { alert("නම ඇතුළත් කරන්න!"); }
+            } else { alert("කරුණාකර නම ඇතුළත් කරන්න!"); }
+        }
+
+        function showVault() {
+            document.getElementById("main-app").style.display = "none";
+            document.getElementById("vault-screen").style.display = "block";
+        }
+
+        function checkVault() {
+            let pass = document.getElementById("vaultPass").value;
+            if(pass === "1234") { // මෙතන 1234 වෙනුවට ඔයාට ඕන password එකක් දාන්න
+                document.getElementById("vault-content").style.display = "block";
+                alert("Vault Unlocked!");
+            } else {
+                alert("වැරදි මුරපදයක්!");
+            }
+        }
+
+        function backToMain() {
+            document.getElementById("vault-screen").style.display = "none";
+            document.getElementById("main-app").style.display = "block";
         }
     </script>
 </body>
 </html>
+
