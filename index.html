@@ -4,81 +4,38 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Nexora Pro Max</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
-        /* General Styling */
-        body {
-            font-family: 'Segoe UI', sans-serif;
-            margin: 0;
-            overflow: hidden;
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            color: white;
-            transition: 0.5s;
-        }
-
-        /* Backgrounds */
+        body { font-family: 'Segoe UI', sans-serif; margin: 0; overflow: hidden; height: 100vh; display: flex; justify-content: center; align-items: center; color: white; transition: 0.5s; }
         .login-bg { background: linear-gradient(45deg, #0f2027, #203a43, #2c5364); }
         .main-bg { background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d); background-size: 400% 400%; animation: gradientMove 10s infinite; }
 
-        @keyframes gradientMove {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
+        @keyframes gradientMove { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
 
-        /* Snowflakes Animation */
         #snow-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 999; }
         .snowflake { position: absolute; top: -10px; color: white; animation: fall linear infinite; }
         @keyframes fall { to { transform: translateY(105vh); } }
 
-        /* Container & UI Elements */
-        .container {
-            background: rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(15px);
-            padding: 30px;
-            border-radius: 25px;
-            text-align: center;
-            width: 85%;
-            max-width: 400px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            z-index: 10;
-        }
-
+        .container { background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(15px); padding: 25px; border-radius: 25px; text-align: center; width: 85%; max-width: 420px; border: 1px solid rgba(255, 255, 255, 0.2); z-index: 10; position: relative; }
         .hidden { display: none !important; }
 
-        input {
-            width: 100%; padding: 12px; margin: 10px 0;
-            border-radius: 10px; border: none; text-align: center;
-            background: rgba(255, 255, 255, 0.2); color: white;
-        }
-
-        .btn {
-            width: 100%; padding: 12px; margin: 8px 0;
-            border-radius: 12px; border: none; cursor: pointer;
-            font-weight: bold; font-size: 15px; transition: 0.3s;
-            color: white; background: #2575fc;
-        }
-
+        input, textarea { width: 100%; padding: 12px; margin: 10px 0; border-radius: 10px; border: none; background: rgba(255, 255, 255, 0.2); color: white; box-sizing: border-box; }
+        .btn { width: 100%; padding: 12px; margin: 8px 0; border-radius: 12px; border: none; cursor: pointer; font-weight: bold; transition: 0.3s; color: white; background: #2575fc; }
         .btn:hover { transform: scale(1.05); filter: brightness(1.2); }
         .btn:active { transform: scale(0.95); }
 
-        /* Feature Grid */
         .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 15px; }
-        .grid-item {
-            background: rgba(0, 0, 0, 0.5); padding: 15px;
-            border-radius: 15px; cursor: pointer; border: 1px solid rgba(255, 255, 255, 0.1);
-        }
+        .grid-item { background: rgba(0, 0, 0, 0.5); padding: 15px; border-radius: 15px; cursor: pointer; border: 1px solid rgba(255, 255, 255, 0.1); }
 
-        /* Iframe Window */
-        #app-window { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 2000; }
-        iframe { width: 100%; height: calc(100% - 50px); border: none; background: white; }
+        /* Gemini Chat UI */
+        #gemini-chat { height: 300px; overflow-y: auto; text-align: left; padding: 10px; background: rgba(0,0,0,0.3); border-radius: 10px; font-size: 14px; margin-bottom: 10px; }
+        .msg { margin-bottom: 10px; padding: 8px; border-radius: 8px; }
+        .user-msg { background: #2575fc; align-self: flex-end; }
+        .ai-msg { background: #444; }
 
-        /* Vault Area */
-        .vault-area { background: #161b22; padding: 15px; border-radius: 15px; text-align: left; margin-top: 10px; }
-        #preview-gallery { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; max-height: 150px; overflow-y: auto; }
-        .preview-img { width: 70px; height: 70px; object-fit: cover; border-radius: 5px; }
+        /* Vault & Gallery */
+        #preview-gallery { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 10px; max-height: 120px; overflow-y: auto; }
+        .preview-img { width: 60px; height: 60px; object-fit: cover; border-radius: 5px; }
     </style>
 </head>
 <body class="login-bg">
@@ -90,65 +47,63 @@
     </audio>
 
     <div id="login-screen" class="container">
-        <h2>Nexora Pro Max</h2>
+        <h2 style="margin:0;">Nexora Pro Max</h2>
         <input type="text" id="username" placeholder="ඔබේ නම ලියන්න...">
         <button class="btn" onclick="startApp()">START APP</button>
     </div>
 
     <div id="main-screen" class="container hidden">
-        <h3 id="welcome-txt">ආයුබෝවන්!</h3>
+        <h3 id="welcome-txt" style="margin:0;">ආයුබෝවන්!</h3>
         <div class="grid">
-            <div class="grid-item" onclick="btnClick(); openApp('https://gemini.google.com')">🤖 Gemini AI</div>
-            <div class="grid-item" onclick="btnClick(); openApp('https://www.ilovepdf.com/jpg_to_pdf')">📄 Image to PDF</div>
+            <div class="grid-item" onclick="btnClick(); showSection('gemini-ui')">🤖 Gemini AI</div>
+            <div class="grid-item" onclick="btnClick(); showSection('pdf-ui')">📄 Image to PDF</div>
             <div class="grid-item" onclick="btnClick(); window.open('https://youtube.com/@nexoralab-y8j')">📺 YouTube</div>
             <div class="grid-item" onclick="btnClick(); window.open('https://whatsapp.com/channel/0029Vb7asEM9hXF90ZoOX12H')">💬 WhatsApp</div>
         </div>
         <button class="btn" style="background: #ff4b2b; margin-top: 15px;" onclick="btnClick(); showVault()">🔒 Private Vault</button>
     </div>
 
-    <div id="app-window" class="hidden">
-        <div style="background: #161b22; padding: 10px; display: flex; justify-content: space-between;">
-            <span>Nexora Browser</span>
-            <button onclick="btnClick(); closeApp()" style="background: red; color: white; border: none; border-radius: 5px; padding: 5px 15px;">Back</button>
-        </div>
-        <iframe id="app-frame" src=""></iframe>
+    <div id="gemini-ui" class="container hidden">
+        <h4>Gemini AI Chat 🤖</h4>
+        <div id="gemini-chat"></div>
+        <input type="text" id="gemini-input" placeholder="ප්‍රශ්නය මෙතන ලියන්න...">
+        <button class="btn" onclick="askGemini()">Ask Gemini</button>
+        <button class="btn" style="background:gray;" onclick="goBack()">Back</button>
+    </div>
+
+    <div id="pdf-ui" class="container hidden">
+        <h4>Images to PDF 📄</h4>
+        <p style="font-size: 12px;">උපරිම පින්තූර 20ක් තෝරන්න.</p>
+        <input type="file" id="pdf-input" multiple accept="image/*">
+        <div id="pdf-previews" style="display:flex; flex-wrap:wrap; gap:5px; margin-bottom:10px;"></div>
+        <button class="btn" style="background:#28a745;" onclick="generatePDF()">Convert to PDF</button>
+        <button class="btn" style="background:gray;" onclick="goBack()">Back</button>
     </div>
 
     <div id="vault-screen" class="container hidden">
         <h3>🔒 Private Vault</h3>
-        <div class="vault-area">
-            <p style="font-size: 13px;">Secret Code Saver:</p>
-            <textarea id="code-box" style="width: 100%; height: 60px; background: #0d1117; color: #0f0; border: 1px solid #333;"></textarea>
-            <button class="btn" style="padding: 5px; font-size: 12px;" onclick="btnClick(); saveCode()">Save Code</button>
-            
-            <hr style="border: 0.1px solid #333; margin: 15px 0;">
-            
-            <p style="font-size: 13px;">Hide Photos/Videos:</p>
-            <input type="file" id="media-input" multiple accept="image/*,video/*" style="font-size: 11px;">
-            <div id="preview-gallery"></div>
-        </div>
-        <button class="btn" style="background: gray;" onclick="btnClick(); closeVault()">Back to Menu</button>
+        <p style="font-size: 12px; text-align:left;">Secret Code:</p>
+        <textarea id="code-box"></textarea>
+        <button class="btn" style="padding:5px; font-size:12px; background:#238636;" onclick="saveCode()">Save Code</button>
+        <hr style="border:0.1px solid #333; margin:15px 0;">
+        <p style="font-size: 12px; text-align:left;">Private Gallery:</p>
+        <input type="file" id="media-input" multiple accept="image/*,video/*">
+        <div id="preview-gallery"></div>
+        <button class="btn" style="background: gray; margin-top:10px;" onclick="goBack()">Back</button>
     </div>
 
     <script>
-        // Button Click Sound Effect
-        function btnClick() {
-            let snd = new Audio('https://www.soundjay.com/buttons/button-16.mp3');
-            snd.play();
-        }
+        const API_KEY = "AIzaSyCA7n0laiPRZdE7ZNLuAzBAQZC63zLomvk";
 
-        // Snow Animation
+        function btnClick() { new Audio('https://www.soundjay.com/buttons/button-16.mp3').play(); }
+
         function createSnow() {
-            const container = document.getElementById('snow-container');
             setInterval(() => {
                 let flake = document.createElement('div');
-                flake.className = 'snowflake';
-                flake.innerHTML = '❄';
+                flake.className = 'snowflake'; flake.innerHTML = '❄';
                 flake.style.left = Math.random() * 100 + 'vw';
-                flake.style.opacity = Math.random();
-                flake.style.fontSize = (Math.random() * 15 + 10) + 'px';
                 flake.style.animationDuration = (Math.random() * 3 + 2) + 's';
-                container.appendChild(flake);
+                document.getElementById('snow-container').appendChild(flake);
                 setTimeout(() => flake.remove(), 4000);
             }, 200);
         }
@@ -157,70 +112,101 @@
             let name = document.getElementById('username').value;
             if (name) {
                 btnClick();
-                document.getElementById('bgMusic').play().catch(e => console.log("Autoplay blocked"));
+                document.getElementById('bgMusic').play().catch(() => {});
                 document.getElementById('login-screen').classList.add('hidden');
                 document.getElementById('main-screen').classList.remove('hidden');
                 document.body.className = "main-bg";
                 document.getElementById('welcome-txt').innerText = "ආයුබෝවන්, " + name + "!";
                 createSnow();
-            } else {
-                alert("කරුණාකර නම ලියන්න!");
-            }
+            } else { alert("නම ලියන්න!"); }
         }
 
-        function openApp(url) {
-            document.getElementById('app-frame').src = url;
-            document.getElementById('app-window').classList.remove('hidden');
+        function showSection(id) {
+            document.getElementById('main-screen').classList.add('hidden');
+            document.getElementById(id).classList.remove('hidden');
         }
 
-        function closeApp() {
-            document.getElementById('app-window').classList.add('hidden');
-            document.getElementById('app-frame').src = "";
-        }
-
-        function showVault() {
-            let pw = prompt("Password එක ඇතුළත් කරන්න:");
-            if (pw === "1234") {
-                document.getElementById('main-screen').classList.add('hidden');
-                document.getElementById('vault-screen').classList.remove('hidden');
-                document.getElementById('code-box').value = localStorage.getItem('savedCode') || "";
-            } else {
-                alert("මුරපදය වැරදියි!");
-            }
-        }
-
-        function closeVault() {
-            document.getElementById('vault-screen').classList.add('hidden');
+        function goBack() {
+            document.querySelectorAll('.container').forEach(c => c.classList.add('hidden'));
             document.getElementById('main-screen').classList.remove('hidden');
         }
 
-        function saveCode() {
-            localStorage.setItem('savedCode', document.getElementById('code-box').value);
-            alert("Code එක ආරක්ෂිතව සුරැකුණා!");
+        // --- Gemini Logic ---
+        async function askGemini() {
+            let input = document.getElementById('gemini-input');
+            let chat = document.getElementById('gemini-chat');
+            if(!input.value) return;
+
+            chat.innerHTML += `<div class="msg user-msg">${input.value}</div>`;
+            let prompt = input.value;
+            input.value = "";
+
+            try {
+                let res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${API_KEY}`, {
+                    method: "POST",
+                    body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+                });
+                let data = await res.json();
+                let reply = data.candidates[0].content.parts[0].text;
+                chat.innerHTML += `<div class="msg ai-msg">${reply}</div>`;
+                chat.scrollTop = chat.scrollHeight;
+            } catch (e) { chat.innerHTML += `<div class="msg ai-msg">Error: සමාවෙන්න, මට පිළිතුර සොයාගත නොහැකි විය.</div>`; }
         }
 
-        // Media Hide Logic
-        document.getElementById('media-input').addEventListener('change', function(e) {
-            const gallery = document.getElementById('preview-gallery');
-            Array.from(e.target.files).forEach(file => {
-                const reader = new FileReader();
-                reader.onload = function(event) {
-                    let item;
-                    if (file.type.startsWith('image/')) {
-                        item = document.createElement('img');
-                    } else {
-                        item = document.createElement('video');
-                        item.controls = true;
-                    }
-                    item.src = event.target.result;
-                    item.className = 'preview-img';
-                    gallery.appendChild(item);
-                }
-                reader.readAsDataURL(file);
+        // --- PDF Logic ---
+        let pdfImages = [];
+        document.getElementById('pdf-input').onchange = function(e) {
+            pdfImages = Array.from(e.target.files).slice(0, 20);
+            let prev = document.getElementById('pdf-previews');
+            prev.innerHTML = "";
+            pdfImages.forEach(f => {
+                let img = document.createElement('img');
+                img.src = URL.createObjectURL(f);
+                img.style.width="40px"; img.style.height="40px"; img.style.objectFit="cover";
+                prev.appendChild(img);
             });
-            alert("ගොනු සාර්ථකව ඇප් එකට එකතු කළා. දැන් ඔබට ගැලරියෙන් මේවා මකා දැමිය හැකියි.");
-        });
+        };
+
+        async function generatePDF() {
+            if(pdfImages.length === 0) return alert("කරුණාකර පින්තූර තෝරන්න!");
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            for(let i=0; i<pdfImages.length; i++) {
+                let imgData = await new Promise(resolve => {
+                    let reader = new FileReader();
+                    reader.onload = (e) => resolve(e.target.result);
+                    reader.readAsDataURL(pdfImages[i]);
+                });
+                if(i > 0) doc.addPage();
+                doc.addImage(imgData, 'JPEG', 10, 10, 190, 250);
+            }
+            doc.save("Nexora_Document.pdf");
+            alert("PDF එක සකසා අවසන්!");
+        }
+
+        // --- Vault Logic ---
+        function showVault() {
+            if(prompt("Password:") === "1234") {
+                showSection('vault-screen');
+                document.getElementById('code-box').value = localStorage.getItem('savedCode') || "";
+            } else { alert("වැරදි මුරපදයක්!"); }
+        }
+        function saveCode() { localStorage.setItem('savedCode', document.getElementById('code-box').value); alert("Saved!"); }
+
+        document.getElementById('media-input').onchange = function(e) {
+            let gal = document.getElementById('preview-gallery');
+            Array.from(e.target.files).forEach(f => {
+                let reader = new FileReader();
+                reader.onload = (ev) => {
+                    let el = f.type.startsWith('image/') ? document.createElement('img') : document.createElement('video');
+                    el.src = ev.target.result; el.className = 'preview-img'; if(f.type.startsWith('video/')) el.controls = true;
+                    gal.appendChild(el);
+                };
+                reader.readAsDataURL(f);
+            });
+            alert("ගොනු එකතු කළා. දැන් ඔබට ගැලරියෙන් මේවා මකා දැමිය හැක.");
+        };
     </script>
 </body>
 </html>
-                
