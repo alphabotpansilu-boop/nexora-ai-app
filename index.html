@@ -4,344 +4,585 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Nexora Pro Max</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    
     <style>
-        /* General Styles */
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        * {
+            box-sizing: border-box;
             margin: 0;
-            overflow: hidden;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            user-select: none;
+        }
+
+        body {
+            background: linear-gradient(-45deg, #0f172a, #1e1b4b, #311042, #020617);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
+            overflow: hidden;
             color: white;
-            transition: background 0.5s;
         }
 
-        /* Backgrounds */
-        .login-bg { background: linear-gradient(135deg, #0d21a1, #210d4a); }
-        .main-bg { background: linear-gradient(135deg, #161b22, #0d1117); background-size: 400% 400%; animation: gradientNav 15s ease infinite; }
-
-        @keyframes gradientNav {
+        @keyframes gradientBG {
             0% { background-position: 0% 50%; }
             50% { background-position: 100% 50%; }
             100% { background-position: 0% 50%; }
         }
 
-        /* Snowflakes Animation */
-        .snowflake { position: fixed; top: -10px; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 999; }
-        @keyframes fall { to { transform: translateY(105vh); } }
+        /* Snow Effect overlay */
+        .snow-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 999;
+        }
 
-        /* Container & Card Elements */
+        .snowflake {
+            position: absolute;
+            color: #fff;
+            font-size: 1em;
+            opacity: 0.8;
+            animation: fall linear infinite;
+        }
+
+        @keyframes fall {
+            0% { transform: translateY(-20px) rotate(0deg); }
+            100% { transform: translateY(105vh) rotate(360deg); }
+        }
+
         .container {
-            background: rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(10px);
-            padding: 30px;
-            border-radius: 20px;
+            background: rgba(30, 30, 40, 0.75);
+            backdrop-filter: blur(15px);
+            padding: 25px;
+            border-radius: 24px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
             text-align: center;
-            width: 85%;
+            width: 90%;
             max-width: 400px;
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255,255,255,0.1);
+            position: relative;
             z-index: 10;
         }
 
         .hidden { display: none !important; }
 
-        input {
-            width: 100%; padding: 12px; margin: 10px 0;
-            border-radius: 10px; border: none; text-align: center;
-            background: rgba(255, 255, 255, 0.1); color: white;
+        /* Top Profile Image Layout */
+        .profile-container {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 15px auto;
+            border-radius: 50%;
+            overflow: hidden;
+            border: 3px solid #ff4b2b;
+            box-shadow: 0 0 15px rgba(255, 75, 43, 0.5);
+        }
+
+        .profile-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        h2, h3, h4 {
+            margin-bottom: 20px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 14px;
+            margin-bottom: 15px;
+            border-radius: 12px;
+            border: 2px solid rgba(255,255,255,0.1);
+            background: rgba(255,255,255,0.05);
+            color: white;
+            text-align: center;
+            font-size: 16px;
+            outline: none;
+            transition: 0.3s;
+        }
+
+        input:focus {
+            border-color: #ff4b2b;
+            background: rgba(255,255,255,0.1);
         }
 
         .btn {
-            width: 100%; padding: 12px; margin: 10px 0;
-            border-radius: 10px; border: none; cursor: pointer;
-            font-weight: bold; font-size: 15px; transition: 0.3s;
-            color: white; background: #2374f2;
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #ff416c, #ff4b2b);
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 5px 15px rgba(255, 75, 43, 0.3);
+            margin-bottom: 10px;
         }
 
-        .btn:hover { transform: scale(1.02); filter: brightness(1.2); }
-        .btn-share { background: #10b981; margin-top: 5px; } /* Green for Share */
+        .btn:active { transform: scale(0.98); }
+        .btn-secondary { background: linear-gradient(135deg, #4f46e5, #3b82f6); box-shadow: 0 5px 15px rgba(59, 130, 246, 0.3); }
+        .btn-danger { background: linear-gradient(135deg, #dc2626, #b91c1c); box-shadow: 0 5px 15px rgba(220, 38, 38, 0.3); }
 
-        /* Grid Layout for Features */
-        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px; }
-        .item { background: rgba(255, 255, 255, 0.05); padding: 20px; border-radius: 15px; cursor: pointer; border: 1px solid rgba(255, 255, 255, 0.1); transition: 0.3s; }
-        .item:hover { background: rgba(255, 255, 255, 0.15); transform: translateY(-3px); }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
 
-        /* App Window Framework */
-        #app-window { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 2000; }
-        #window-header { background: #161b22; padding: 10px; display: flex; justify-content: space-between; align-items: center; color: white; }
-        iframe { width: 100%; height: calc(100% - 50px); border: none; }
+        .grid-item {
+            background: rgba(255,255,255,0.05);
+            padding: 20px 10px;
+            border-radius: 16px;
+            cursor: pointer;
+            transition: 0.3s;
+            border: 1px solid rgba(255,255,255,0.05);
+            font-weight: 600;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
 
-        /* Vault & Feature Windows */
-        .vault-section { background: #161b22; padding: 20px; border-radius: 15px; text-align: left; }
-        .vault-item { display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.05); padding: 10px; margin-top: 8px; border-radius: 8px; }
-        
-        /* Media Preview Styles */
-        .media-preview { max-width: 100%; max-height: 150px; border-radius: 8px; margin-top: 5px; display: block; cursor: pointer; }
-        .vault-media-container { text-align: center; }
+        .grid-item:hover {
+            background: rgba(255,255,255,0.12);
+            transform: translateY(-3px);
+            border-color: rgba(255,255,255,0.2);
+        }
 
-        /* Lightbox for Full View */
-        #lightbox { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 3000; display: flex; justify-content: center; align-items: center; }
-        #lightbox-content { max-width: 90%; max-height: 80%; border-radius: 10px; }
+        .grid-item span { font-size: 24px; }
+
+        /* Vault & PDF History Lists */
+        .vault-gallery, .pdf-list-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin: 15px 0;
+            max-height: 180px;
+            overflow-y: auto;
+            padding: 5px;
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            background: rgba(0,0,0,0.2);
+        }
+
+        .pdf-list-container {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            max-height: 150px;
+            text-align: left;
+        }
+
+        .pdf-history-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255,255,255,0.08);
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 13px;
+        }
+
+        .pdf-history-item span {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 180px;
+        }
+
+        .pdf-share-btn {
+            background: #00ffcc;
+            color: black;
+            border: none;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 11px;
+            cursor: pointer;
+        }
+
+        .vault-item {
+            position: relative;
+            aspect-ratio: 1;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.2);
+            background: #000;
+        }
+
+        .vault-item img, .vault-item video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .share-overlay-btn {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: rgba(0, 0, 0, 0.75);
+            color: #00ffcc;
+            font-size: 11px;
+            padding: 4px 0;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            letter-spacing: 0.5px;
+        }
+
+        .file-box {
+            border: 2px dashed rgba(255,255,255,0.2);
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            cursor: pointer;
+            background: rgba(255,255,255,0.02);
+        }
+
+        .file-box:hover { border-color: #ff4b2b; }
+
+        #pdf-preview-gallery {
+            display: flex;
+            gap: 5px;
+            overflow-x: auto;
+            margin-bottom: 10px;
+            padding: 5px;
+        }
+
+        #pdf-preview-gallery img {
+            width: 50px;
+            height: 50px;
+            object-fit: cover;
+            border-radius: 6px;
+            border: 1px solid rgba(255,255,255,0.3);
+        }
     </style>
 </head>
-<body class="login-bg">
+<body>
 
-    <div class="snowflake" id="snow-container"></div>
+    <audio id="bgMusic" loop>
+        <source src="parano.mp3" type="audio/mpeg">
+    </audio>
 
-    <div class="container" id="login-screen">
-        <img src="https://i.ibb.co/68037/profile.jpg" style="width: 100px; border-radius: 50%; border: 3px solid #2374f2;" alt="Logo">
+    <div class="snow-container" id="snowContainer"></div>
+
+    <div id="login-screen" class="container">
+        <div class="profile-container">
+            <img src="profile.jpg" alt="Profile Image">
+        </div>
         <h2>Nexora Pro Max</h2>
-        <p>ඇප් එකට ඇතුළු වීමට නම ලියන්න</p>
         <input type="text" id="username" placeholder="ඔබේ නම (Pansilu)...">
         <button class="btn" onclick="startApp()">START APP</button>
     </div>
 
-    <div class="container hidden" id="main-screen">
-        <h3 id="welcome-msg">ආයුබෝවන්!</h3>
+    <div id="main-screen" class="container hidden">
+        <div class="profile-container">
+            <img src="profile.jpg" alt="Profile Image">
+        </div>
+        <h3 id="welcome-text">ආයුබෝවන්!</h3>
+        
         <div class="grid">
-            <div class="item" onclick="openApp('https://gemini.google.com/app')">🤖<br>Gemini AI</div>
-            <div class="item" onclick="openApp('https://www.whatsapp.com/channel/0029vb7asEM9hXF90zOoOX12H')">💬<br>WhatsApp</div>
-            <div class="item" onclick="openApp('https://youtube.com/@NexoraLab-y8j')">📺<br>YouTube</div>
-            <div class="item" onclick="toggleSection('pdf-section')">📄<br>Image to PDF</div>
+            <div class="grid-item" onclick="openTool('youtube')"><span>📺</span>YouTube</div>
+            <div class="grid-item" onclick="openTool('whatsapp')"><span>💬</span>WhatsApp</div>
+            <div class="grid-item" onclick="openTool('pdf-converter')"><span>📄</span>Image to PDF</div>
+            <div class="grid-item" onclick="checkVaultAccess()"><span>🔒</span>Private Vault</div>
         </div>
-        <button class="btn" style="background:#f59e0b; margin-top: 15px;" onclick="checkVaultAccess()">🔒 Private Vault</button>
     </div>
 
-    <div class="container hidden" id="pdf-section">
-        <h3>📄 Image to PDF</h3>
-        <input type="file" id="pdf-inputs" accept="image/*" multiple>
-        <button class="btn" onclick="generatePDF()">PDF එක සාදන්න</button>
-        <div id="pdf-output-container" class="hidden">
-            <p style="color: #10b981;">PDF එක සාර්ථකව නිපදවන ලදී!</p>
-            <button class="btn btn-share" id="share-pdf-btn">Share PDF</button>
+    <div id="pdf-screen" class="container hidden">
+        <h3>Image to PDF Converter</h3>
+        <div class="file-box" onclick="document.getElementById('pdf-inputs').click()">
+            පින්තූර තෝරන්න (Max 20)
+            <input type="file" id="pdf-inputs" accept="image/*" multiple class="hidden" onchange="previewPDFImages()">
         </div>
-        <button class="btn" style="background:#ef4444;" onclick="backToMain('pdf-section')">ආපසු</button>
+        <div id="pdf-preview-gallery"></div>
+        <button class="btn" onclick="generatePDF()">Convert to PDF</button>
+        
+        <h4 style="font-size: 14px; text-align: left; margin-top: 10px;">සෑදූ PDF ගොනු:</h4>
+        <div class="pdf-list-container" id="pdfList"></div>
+
+        <button class="btn btn-secondary" onclick="backToMenu('pdf-screen')">Back to Menu</button>
     </div>
 
-    <div class="container hidden" id="vault-section">
+    <div id="vault-screen" class="container hidden">
         <h3>🔒 Private Vault</h3>
-        <input type="file" id="vault-input" accept="image/*,video/*" multiple>
-        <button class="btn" onclick="saveToVault()">Vault එකට දමන්න</button>
-        <hr style="border: 0.5px solid rgba(255,255,255,0.1); margin: 15px 0;">
-        <div id="vault-items" class="vault-section" style="max-height: 200px; overflow-y: auto;">
-            </div>
-        <button class="btn" style="background:#ef4444; margin-top: 15px;" onclick="backToMain('vault-section')">ආපසු</button>
-    </div>
-
-    <div class="hidden" id="app-window">
-        <div id="window-header">
-            <span id="window-title">Nexora Browser</span>
-            <button onclick="closeApp()" style="background:#ef4444; color:white; border:none; padding:5px 15px; border-radius:5px; cursor:pointer;">Back</button>
+        <p style="font-size: 13px; margin-bottom: 10px; color: #ccc;">රහසිගත ඡායාරූප සහ වීඩියෝ සුරකින්න / Share කරන්න.</p>
+        
+        <div class="file-box" onclick="document.getElementById('vault-input').click()">
+            Vault එකට එක් කරන්න (Photo/Video)
+            <input type="file" id="vault-input" accept="image/*,video/*" multiple class="hidden" onchange="saveToVault()">
         </div>
-        <iframe id="app-frame" src=""></iframe>
-    </div>
 
-    <div id="lightbox" class="hidden" onclick="closeLightbox()">
-        <div id="lightbox-media-box" onclick="event.stopPropagation()">
-            </div>
-    </div>
+        <div class="vault-gallery" id="vaultGallery"></div>
 
-    <audio id="bg-music" src="https://codeskulptor-demos.commondatastorage.googleapis.com/descent/background%20music.mp3" loop></audio>
+        <button class="btn btn-danger" onclick="clearVault()">Clear All Items</button>
+        <button class="btn btn-secondary" onclick="backToMenu('vault-screen')">Back to Menu</button>
+    </div>
 
     <script>
-        let currentGeneratedPdfBlob = null; // Store PDF blob for sharing
+        const clickSound = new Audio("https://www.soundjay.com/button/button-16.mp3");
 
-        // Snow animation creator
-        const container = document.getElementById('snow-container');
-        for (let i = 0; i < 50; i++) {
-            const flake = document.createElement('div');
-            flake.style.cssText = `
-                position: absolute; width: ${Math.random() * 5 + 2}px; height: ${Math.random() * 5 + 2}px;
-                background: white; border-radius: 50%; opacity: ${Math.random()};
-                left: ${Math.random() * 100}vw; top: ${Math.random() * -20}px;
-                animation: fall ${Math.random() * 5 + 5}s linear infinite;
-                animation-delay: ${Math.random() * 5}s;
-            `;
-            container.appendChild(flake);
+        // Snow effect generation
+        function createSnow() {
+            const container = document.getElementById('snowContainer');
+            for (let i = 0; i < 30; i++) {
+                let flake = document.createElement('div');
+                flake.className = 'snowflake';
+                flake.innerText = '❄';
+                flake.style.left = Math.random() * 100 + 'vw';
+                flake.style.animationDuration = (Math.random() * 3 + 2) + 's';
+                flake.style.animationDelay = Math.random() * 2 + 's';
+                flake.style.fontSize = (Math.random() * 10 + 10) + 'px';
+                container.appendChild(flake);
+            }
         }
+        createSnow();
 
         function startApp() {
-            let name = document.getElementById("username").value.trim();
-            if(name === "") name = "Pansilu";
+            clickSound.play();
+            let user = document.getElementById('username').value.trim();
+            if(user === "") user = "Pansilu";
             
-            document.body.className = "main-bg";
-            document.getElementById("login-screen").classList.add("hidden");
-            document.getElementById("main-screen").classList.remove("hidden");
-            document.getElementById("welcome-msg").innerText = "ආයුබෝවන්, " + name + "!";
+            document.getElementById('welcome-text').innerText = `ආයුබෝවන්, ${user}!`;
             
-            let music = document.getElementById("bg-music");
-            music.play().catch(() => console.log("Autoplay blocked, waiting for interact"));
+            const bgMusic = document.getElementById('bgMusic');
+            bgMusic.play().catch(() => { console.log("Audio autoplay restricted."); });
+
+            document.getElementById('login-screen').classList.add('hidden');
+            document.getElementById('main-screen').classList.remove('hidden');
         }
 
-        function openApp(url) {
-            document.getElementById("app-frame").src = url;
-            document.getElementById("app-window").classList.remove("hidden");
+        function backToMenu(currentScreenId) {
+            clickSound.play();
+            document.getElementById(currentScreenId).classList.add('hidden');
+            document.getElementById('main-screen').classList.remove('hidden');
         }
 
-        function closeApp() {
-            document.getElementById("app-window").classList.add("hidden");
-            document.getElementById("app-frame").src = "";
-        }
-
-        function toggleSection(id) {
-            document.getElementById("main-screen").classList.add("hidden");
-            document.getElementById(id).classList.remove("hidden");
-            if(id === 'vault-section') loadVaultItems();
-        }
-
-        function backToMain(id) {
-            document.getElementById(id).classList.add("hidden");
-            document.getElementById("main-screen").classList.remove("hidden");
-        }
-
-        // Image to PDF Function with Sharing
-        function generatePDF() {
-            const files = document.getElementById("pdf-inputs").files;
-            if(files.length === 0) { alert("කරුණාකර පින්තූර තෝරන්න!"); return; }
-            
-            // Simulating a PDF creation blob safely inside browser memory
-            const dummyPdfContent = "Nexora PDF Document - Generated successfully from Images.";
-            currentGeneratedPdfBlob = new Blob([dummyPdfContent], { type: "application/pdf" });
-            
-            document.getElementById("pdf-output-container").classList.remove("hidden");
-            
-            document.getElementById("share-pdf-btn").onclick = function() {
-                shareFile(currentGeneratedPdfBlob, "Nexora_Document.pdf", "application/pdf");
-            };
-        }
-
-        // Private Vault Passcode Logic
-        function checkVaultAccess() {
-            let pass = prompt("Private Vault මුරපදය ඇතුළත් කරන්න:");
-            if(pass === "1234") {
-                toggleSection('vault-section');
-            } else {
-                alert("මුරපදය වැරදියි!");
+        function openTool(type) {
+            clickSound.play();
+            if(type === 'youtube') {
+                window.open('https://youtube.com/@NexoraLab-y8j', '_blank');
+            } else if(type === 'whatsapp') {
+                window.open('https://whatsapp.com/channel/0029Vb7asEM9hXF90ZcoZB3f', '_blank');
+            } else if(type === 'pdf-converter') {
+                document.getElementById('main-screen').classList.add('hidden');
+                document.getElementById('pdf-screen').classList.remove('hidden');
+                loadPDFList();
             }
         }
 
-        // Save base64 media data into browser localStorage
-        function saveToVault() {
-            const fileInput = document.getElementById("vault-input");
-            const files = fileInput.files;
-            if(files.length === 0) return;
+        /* --- PRIVATE VAULT SECURITY & LOGIC --- */
+        function checkVaultAccess() {
+            clickSound.play();
+            let code = prompt("Private Vault එකට ඇතුළු වීමට Lock Code එක ('1234') ලබා දෙන්න:");
+            if(code === "1234") {
+                document.getElementById('main-screen').classList.add('hidden');
+                document.getElementById('vault-screen').classList.remove('hidden');
+                loadVaultImages();
+            } else if(code !== null) {
+                alert("වැරදි කේතයකි! නැවත උත්සාහ කරන්න.");
+            }
+        }
 
-            let vaultData = JSON.parse(localStorage.getItem("nexora_vault") || "[]");
+        function saveToVault() {
+            const files = document.getElementById('vault-input').files;
+            if (files.length === 0) return;
 
             Array.from(files).forEach(file => {
                 const reader = new FileReader();
                 reader.onload = function(e) {
-                    vaultData.push({
+                    let savedData = localStorage.getItem('vault_images');
+                    let list = savedData ? JSON.parse(savedData) : [];
+                    list.push({
                         name: file.name,
                         type: file.type,
                         data: e.target.result
                     });
-                    localStorage.setItem("nexora_vault", JSON.stringify(vaultData));
-                    loadVaultItems();
+                    localStorage.setItem('vault_images', JSON.stringify(list));
+                    loadVaultImages();
                 };
                 reader.readAsDataURL(file);
             });
-            fileInput.value = "";
         }
 
-        // Load Vault contents & Inject Preview & Share Triggers
-        function loadVaultItems() {
-            const container = document.getElementById("vault-items");
-            container.innerHTML = "";
-            let vaultData = JSON.parse(localStorage.getItem("nexora_vault") || "[]");
+        function loadVaultImages() {
+            const gallery = document.getElementById('vaultGallery');
+            gallery.innerHTML = "";
+            let savedData = localStorage.getItem('vault_images');
+            let list = savedData ? JSON.parse(savedData) : [];
 
-            if(vaultData.length === 0) {
-                container.innerHTML = "<p style='font-size:12px; color:#888;'>කිසිදු ගොනුවක් සුරැකී නැත.</p>";
+            if(list.length === 0) {
+                gallery.innerHTML = `<p style="grid-column: span 3; font-size:12px; color:#aaa; padding:10px;">ලබාදුන් පින්තූර හෝ වීඩියෝ නොමැත.</p>`;
                 return;
             }
 
-            vaultData.forEach((item, index) => {
-                let div = document.createElement("div");
-                div.className = "vault-item";
+            list.forEach((item, index) => {
+                let div = document.createElement('div');
+                div.className = 'vault-item';
                 
-                let mediaTag = "";
-                if(item.type.startsWith("image/")) {
-                    mediaTag = `<img src="${item.data}" class="media-preview" onclick="viewFullMedia('${item.data}', 'image')">`;
-                } else if(item.type.startsWith("video/")) {
-                    mediaTag = `<div class="vault-media-container">
-                                    <video src="${item.data}" class="media-preview" onclick="viewFullMedia('${item.data}', 'video')"></video>
-                                    <span style="font-size:10px; color:#aaa; display:block;">▶ Video Click to Play</span>
-                                </div>`;
+                let mediaElement;
+                if (item.type && item.type.startsWith('video/')) {
+                    mediaElement = document.createElement('video');
+                    mediaElement.src = item.data;
+                    mediaElement.muted = true;
+                    mediaElement.playsInline = true;
+                } else {
+                    mediaElement = document.createElement('img');
+                    mediaElement.src = item.data;
                 }
+                
+                let shareBtn = document.createElement('button');
+                shareBtn.className = 'share-overlay-btn';
+                shareBtn.innerText = 'SHARE';
+                shareBtn.onclick = () => shareVaultMedia(item.data, item.name, item.type);
 
-                div.innerHTML = `
-                    <div style="flex:1; max-width:60%;">
-                        <span style="font-size:12px; display:block; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${item.name}</span>
-                        ${mediaTag}
-                    </div>
-                    <div>
-                        <button class="btn btn-share" style="padding:5px 10px; font-size:11px; margin:0;" onclick="shareVaultItem(${index})">Share</button>
-                        <button class="btn" style="background:#ef4444; padding:5px 10px; font-size:11px; margin:2px 0 0 0;" onclick="deleteVaultItem(${index})">Delete</button>
-                    </div>
-                `;
-                container.appendChild(div);
+                div.appendChild(mediaElement);
+                div.appendChild(shareBtn);
+                gallery.appendChild(div);
             });
         }
 
-        // Full Screen Preview Mechanism
-        function viewFullMedia(dataUrl, type) {
-            const box = document.getElementById("lightbox-media-box");
-            box.innerHTML = "";
-            
-            if(type === 'image') {
-                box.innerHTML = `<img src="${dataUrl}" id="lightbox-content">`;
-            } else if(type === 'video') {
-                box.innerHTML = `<video src="${dataUrl}" id="lightbox-content" controls autoplay></video>`;
+        async function shareVaultMedia(base64Data, filename, mimeType) {
+            clickSound.play();
+            try {
+                const res = await fetch(base64Data);
+                const blob = await res.blob();
+                const file = new File([blob], filename, { type: mimeType });
+
+                if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                    await navigator.share({
+                        files: [file],
+                        title: 'Nexora Vault Share',
+                        text: 'Private Vault එකෙන් Share කරන ලදි.'
+                    });
+                } else {
+                    alert("ඔබගේ දුරකථනය මෙම Native Share පහසුකමට සපයන්නේ නැත.");
+                }
+            } catch (error) {
+                console.error("Sharing failed", error);
             }
+        }
+
+        function clearVault() {
+            if(confirm("සියලුම දේ Vault එකෙන් ඉවත් කිරීමට අවශ්‍යද?")) {
+                localStorage.removeItem('vault_images');
+                loadVaultImages();
+            }
+        }
+
+        /* --- IMAGE TO PDF CONVERTER LOGIC WITH HISTORY & SHARE --- */
+        function previewPDFImages() {
+            const gallery = document.getElementById('pdf-preview-gallery');
+            gallery.innerHTML = "";
+            const files = document.getElementById('pdf-inputs').files;
             
-            document.getElementById("lightbox").classList.remove("hidden");
+            Array.from(files).forEach(file => {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    let img = document.createElement('img');
+                    img.src = e.target.result;
+                    gallery.appendChild(img);
+                }
+                reader.readAsDataURL(file);
+            });
         }
 
-        function closeLightbox() {
-            document.getElementById("lightbox").classList.add("hidden");
-            document.getElementById("lightbox-media-box").innerHTML = ""; // Stop video from playing in background
-        }
+        async function generatePDF() {
+            clickSound.play();
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            const files = document.getElementById('pdf-inputs').files;
 
-        function deleteVaultItem(index) {
-            let vaultData = JSON.parse(localStorage.getItem("nexora_vault") || "[]");
-            vaultData.splice(index, 1);
-            localStorage.setItem("nexora_vault", JSON.stringify(vaultData));
-            loadVaultItems();
-        }
+            if (files.length === 0) {
+                alert("කරුණාකර ප්‍රථමයෙන් පින්තූර තෝරාගන්න!");
+                return;
+            }
 
-        // Share Individual Vault Files
-        function shareVaultItem(index) {
-            let vaultData = JSON.parse(localStorage.getItem("nexora_vault") || "[]");
-            let item = vaultData[index];
-            
-            // Convert DataURL back to Blob for native sharing
-            fetch(item.data)
-                .then(res => res.blob())
-                .then(blob => {
-                    shareFile(blob, item.name, item.type);
+            alert("PDF එක සකසමින් පවතී. කරුණාකර රැඳී සිටින්න...");
+
+            for (let i = 0; i < files.length; i++) {
+                if (i > 0) doc.addPage();
+                
+                const promise = new Promise((resolve) => {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        doc.addImage(e.target.result, 'JPEG', 10, 10, 190, 250);
+                        resolve();
+                    };
+                    reader.readAsDataURL(files[i]);
                 });
+                await promise;
+            }
+
+            // Save PDF to a DataURL to keep in app history
+            const pdfOutputBase64 = doc.output('datauristring');
+            const pdfName = `Nexora_${Date.now()}.pdf`;
+
+            let savedPDFs = localStorage.getItem('nexora_pdfs');
+            let pdfList = savedPDFs ? JSON.parse(savedPDFs) : [];
+            pdfList.push({ name: pdfName, data: pdfOutputBase64 });
+            localStorage.setItem('nexora_pdfs', JSON.stringify(pdfList));
+
+            doc.save(pdfName);
+            alert("PDF එක සාර්ථකව Download විය!");
+            loadPDFList(); // Refresh inside application view
         }
 
-        // Universal Native Share Handler API
-        function shareFile(blob, filename, mimeType) {
-            if (!blob) return;
-            const file = new File([blob], filename, { type: mimeType });
+        function loadPDFList() {
+            const listContainer = document.getElementById('pdfList');
+            listContainer.innerHTML = "";
+            let savedPDFs = localStorage.getItem('nexora_pdfs');
+            let pdfList = savedPDFs ? JSON.parse(savedPDFs) : [];
 
-            if (navigator.canShare && navigator.canShare({ files: [file] })) {
-                navigator.share({
-                    files: [file],
-                    title: filename,
-                    text: 'Nexora App එකෙන් Share කරන ලදී!'
-                })
-                .then(() => console.log('Share successful'))
-                .catch((error) => console.log('Sharing failed', error));
-            } else {
-                alert("ඔබගේ දුරකථනය හෝ බ්‍රව්සරය ඍජුවම File Share කිරීමට සහය දක්වන්නේ නැත.");
+            if(pdfList.length === 0) {
+                listContainer.innerHTML = `<p style="font-size:12px; color:#aaa; padding:5px;">සෑදූ PDF ගොනු කිසිවක් නොමැත.</p>`;
+                return;
+            }
+
+            pdfList.forEach((pdf, index) => {
+                let div = document.createElement('div');
+                div.className = 'pdf-history-item';
+                div.innerHTML = `
+                    <span>📄 ${pdf.name}</span>
+                    <button class="pdf-share-btn" onclick="sharePDFFile('${pdf.data}', '${pdf.name}')">SHARE</button>
+                `;
+                listContainer.appendChild(div);
+            });
+        }
+
+        async function sharePDFFile(base64Data, filename) {
+            clickSound.play();
+            try {
+                const res = await fetch(base64Data);
+                const blob = await res.blob();
+                const file = new File([blob], filename, { type: 'application/pdf' });
+
+                if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                    await navigator.share({
+                        files: [file],
+                        title: 'Nexora Document Share',
+                        text: 'Nexora App එකෙන් සාදන ලද PDF ගොනුවකි.'
+                    });
+                } else {
+                    alert("ඔබගේ දුරකථනය මෙම PDF Share පහසුකමට සපයන්නේ නැත.");
+                }
+            } catch (error) {
+                console.error("PDF Sharing failed", error);
             }
         }
     </script>
 </body>
-    </html>
+</html>
