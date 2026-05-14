@@ -27,7 +27,7 @@
         @keyframes fall { to { transform: translateY(105vh); } }
 
         .container {
-            background: rgba(0, 0, 0, 0.8);
+            background: rgba(0, 0, 0, 0.85);
             padding: 25px;
             border-radius: 20px;
             text-align: center;
@@ -37,37 +37,42 @@
             backdrop-filter: blur(15px);
             max-height: 85vh;
             overflow-y: auto;
+            border: 1px solid rgba(255,255,255,0.1);
         }
 
         .hidden { display: none !important; }
 
         input[type="text"], input[type="password"] {
-            width: 85%; padding: 12px; margin: 10px 0; border-radius: 10px; border: none; font-size: 16px;
+            width: 85%; padding: 12px; margin: 10px 0; border-radius: 10px; border: none; font-size: 16px; background: rgba(255,255,255,0.2); color: white; outline: none; text-align: center;
         }
+        input::placeholder { color: #ddd; }
 
         .btn {
             background: linear-gradient(to right, #ff416c, #ff4b2b);
             color: white; padding: 12px 20px; border: none; border-radius: 10px;
-            cursor: pointer; font-weight: bold; transition: 0.3s; margin: 8px; width: 80%;
+            cursor: pointer; font-weight: bold; transition: 0.3s; margin: 8px; width: 85%; font-size: 15px;
         }
-
         .btn:hover { transform: scale(1.05); }
 
-        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 15px; }
         .grid-item {
-            background: rgba(255, 255, 255, 0.15); padding: 15px; border-radius: 15px;
-            cursor: pointer; transition: 0.3s; border: 1px solid rgba(255,255,255,0.1);
+            background: rgba(255, 255, 255, 0.15); padding: 20px; border-radius: 15px;
+            cursor: pointer; transition: 0.3s; border: 1px solid rgba(255,255,255,0.1); font-weight: bold;
         }
-        .grid-item:hover { background: rgba(255, 255, 255, 0.25); }
+        .grid-item:hover { background: rgba(255, 255, 255, 0.25); transform: translateY(-3px); }
 
-        .top-img { width: 100px; height: 100px; border-radius: 50%; border: 3px solid #fff; margin-bottom: 10px; }
+        /* Top Image Style */
+        .top-img { width: 120px; height: 120px; border-radius: 50%; border: 3px solid #ff416c; margin-bottom: 15px; object-fit: cover; box-shadow: 0 0 15px rgba(255,65,108,0.5); }
         
         #pdf-list, #vault-gallery {
             display: flex; flex-direction: column; gap: 10px; margin-top: 15px;
         }
         .file-item {
-            background: #333; padding: 10px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center;
+            background: rgba(255,255,255,0.1); padding: 10px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; border: 1px solid rgba(255,255,255,0.05);
         }
+        .vault-media { width: 100%; max-height: 150px; object-fit: contain; border-radius: 8px; margin-top: 5px; }
+        .vault-card { background: rgba(255,255,255,0.1); padding: 10px; border-radius: 10px; margin-bottom: 10px; position: relative; }
+        .delete-btn { background: red; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer; font-size: 12px; margin-top: 5px; }
     </style>
 </head>
 <body>
@@ -86,7 +91,7 @@
     </div>
 
     <div id="main-screen" class="container hidden">
-        <img src="https://i.ibb.co/vz6mXmP/user-pro.jpg" class="top-img" alt="User">
+        <img src="https://i.ibb.co/vz6mXmP/user-pro.jpg" class="top-img" alt="Nexora Logo">
         <h3 id="welcome-txt">ආයුබෝවන්!</h3>
         <div class="grid">
             <div class="grid-item" onclick="openLink('https://youtube.com/@NexoraLab-y8j')">📺 YouTube</div>
@@ -98,32 +103,45 @@
 
     <div id="pdf-section" class="container hidden">
         <h3>Image to PDF 📄</h3>
-        <input type="file" id="pdf-input" multiple accept="image/*">
-        <button class="btn" onclick="generatePDF()">Convert (Max 20)</button>
+        <input type="file" id="pdf-input" multiple accept="image/*" class="btn" style="background:transparent; border:1px dashed #fff;">
+        <button class="btn" onclick="generatePDF()">Convert to PDF (Max 20)</button>
         <div id="pdf-list"></div>
-        <button class="btn" onclick="showSection('main-screen')" style="background: #555;">Back</button>
+        <button class="btn" onclick="showSection('main-screen')" style="background: #555;">Back to Menu</button>
     </div>
 
     <div id="vault-section" class="container hidden">
         <h3>🔐 Private Vault</h3>
+        
         <div id="vault-setup" class="hidden">
-            <input type="password" id="new-vault-code" placeholder="Set New Code">
+            <p>ඔබේ රහසිගත Vault Code එක ඇතුළත් කරන්න:</p>
+            <input type="password" id="new-vault-code" placeholder="Set Your Secret Code">
             <button class="btn" onclick="saveVaultCode()">Save Secret Code</button>
         </div>
+
         <div id="vault-content" class="hidden">
-            <input type="file" id="vault-input" multiple accept="image/*,video/*">
+            <p style="font-size:12px; color:#bbb;">මෙහි සුරකින Photo/Video ගැලරියෙන් මැකුවද ආරක්ෂිතව පවතී.</p>
+            <input type="file" id="vault-input" multiple accept="image/*,video/*" class="btn" style="background:transparent; border:1px dashed #fff;">
             <div id="vault-gallery"></div>
         </div>
-        <button class="btn" onclick="showSection('main-screen')" style="background: #555;">Back</button>
+        <button class="btn" onclick="showSection('main-screen')" style="background: #555; margin-top:15px;">Back to Menu</button>
     </div>
 
     <script>
-        // Start Background Music
-        document.body.addEventListener('click', () => {
-            document.getElementById('bgMusic').play();
-        }, { once: true });
+        let db;
 
-        function playSound() { document.getElementById('clickSound').play(); }
+        // Open IndexedDB for Permanent Vault Storage
+        const request = indexedDB.open("NexoraVaultDB", 1);
+        request.onupgradeneeded = function(e) {
+            db = e.target.result;
+            db.createObjectStore("files", { keyPath: "id", autoIncrement: true });
+        };
+        request.onsuccess = function(e) { db = e.target.result; };
+
+        function playSound() { 
+            const snd = document.getElementById('clickSound');
+            snd.currentTime = 0;
+            snd.play(); 
+        }
 
         // Snow Animation
         setInterval(() => {
@@ -132,15 +150,18 @@
             snow.innerHTML = '❄';
             snow.style.left = Math.random() * 100 + 'vw';
             snow.style.animationDuration = Math.random() * 3 + 2 + 's';
+            snow.style.fontSize = Math.random() * 15 + 10 + 'px';
             document.body.appendChild(snow);
             setTimeout(() => snow.remove(), 5000);
-        }, 300);
+        }, 250);
 
         // App Start Logic
         function startApp() {
             playSound();
             const name = document.getElementById('username').value.trim();
             if(name === "Pansilu") {
+                // Play Background Song after user interact
+                document.getElementById('bgMusic').play().catch(err => console.log("Music waiting..."));
                 showSection('main-screen');
                 document.getElementById('welcome-txt').innerText = `ආයුබෝවන්, ${name}!`;
             } else {
@@ -152,32 +173,35 @@
             playSound();
             document.querySelectorAll('.container').forEach(c => c.classList.add('hidden'));
             document.getElementById(id).classList.remove('hidden');
+            if(id === 'vault-section') loadVaultFiles();
         }
 
         function openLink(url) { playSound(); window.open(url, '_blank'); }
 
-        // Image to PDF Logic
+        // --- Image to PDF Suite ---
         async function generatePDF() {
             playSound();
             const input = document.getElementById('pdf-input');
-            if (input.files.length === 0) return alert("පින්තූර තෝරන්න!");
+            if (input.files.length === 0) return alert("කරුණාකර පින්තූර තෝරන්න!");
             
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
             const files = Array.from(input.files).slice(0, 20);
 
+            alert("PDF එක සකසමින් පවතී. කරුණාකර රැඳී සිටින්න...");
+
             for(let i=0; i < files.length; i++) {
                 if(i > 0) doc.addPage();
-                const data = await readFile(files[i]);
+                const data = await readFileAsDataURL(files[i]);
                 doc.addImage(data, 'JPEG', 10, 10, 190, 280);
             }
 
             const pdfBlob = doc.output('blob');
             const url = URL.createObjectURL(pdfBlob);
-            addFileToList(url, "Nexora_PDF_" + Date.now() + ".pdf", 'pdf-list');
+            addPdfToList(url, "Nexora_PDF_" + Date.now() + ".pdf");
         }
 
-        function readFile(file) {
+        function readFileAsDataURL(file) {
             return new Promise(resolve => {
                 const reader = new FileReader();
                 reader.onload = e => resolve(e.target.result);
@@ -185,62 +209,129 @@
             });
         }
 
-        function addFileToList(url, name, elementId) {
-            const container = document.getElementById(elementId);
+        function addPdfToList(url, name) {
+            const container = document.getElementById('pdf-list');
             const div = document.createElement('div');
             div.className = 'file-item';
-            div.innerHTML = `<span>${name.substring(0,15)}...</span> 
-                             <button onclick="shareFile('${url}', '${name}')">Share</button>`;
+            div.innerHTML = `<span>${name.substring(0,18)}...</span> 
+                             <button class="btn" style="width:auto; margin:0; padding:5px 10px;" onclick="shareFile('${url}', '${name}')">Share</button>`;
             container.appendChild(div);
         }
 
         function shareFile(url, name) {
             playSound();
             if (navigator.share) {
-                navigator.share({ title: name, url: url });
+                navigator.share({ title: name, url: url }).catch(err => console.log(err));
             } else {
                 window.open(url);
             }
         }
 
-        // Private Vault Logic
+        // --- Private Vault Suite (IndexedDB Permanent Storage) ---
         function checkVaultAccess() {
-            const pass = prompt("Enter Vault Access Code:");
+            playSound();
+            const pass = prompt("Private Vault එකට ඇතුළු වීමට Lock Code එක ('1234') ලබා දෙන්න:");
             if (pass === "1234") {
                 showSection('vault-section');
-                const saved = localStorage.getItem('myVaultCode');
-                if (!saved) {
+                const savedCustomCode = localStorage.getItem('myVaultCustomCode');
+                if (!savedCustomCode) {
                     document.getElementById('vault-setup').classList.remove('hidden');
+                    document.getElementById('vault-content').classList.add('hidden');
                 } else {
-                    document.getElementById('vault-content').classList.remove('hidden');
+                    verifyCustomCode(savedCustomCode);
                 }
             } else {
                 alert("වැරදි මුරපදයක්!");
             }
         }
 
-        function saveVaultCode() {
-            const code = document.getElementById('new-vault-code').value;
-            if(code) {
-                localStorage.setItem('myVaultCode', code);
-                alert("Code Saved!");
+        function verifyCustomCode(savedCode) {
+            const customPass = prompt("ඔබ කලින් සාදාගත් පෞද්ගලික Secret Code එක ඇතුළත් කරන්න:");
+            if(customPass === savedCode) {
                 document.getElementById('vault-setup').classList.add('hidden');
                 document.getElementById('vault-content').classList.remove('hidden');
+                loadVaultFiles();
+            } else {
+                alert("පෞද්ගලික කේතය වැරදියි!");
+                showSection('main-screen');
+            }
+        }
+
+        function saveVaultCode() {
+            playSound();
+            const code = document.getElementById('new-vault-code').value.trim();
+            if(code.length >= 4) {
+                localStorage.setItem('myVaultCustomCode', code);
+                alert("ඔබේ පෞද්ගලික කේතය සුරැකින ලදී!");
+                document.getElementById('vault-setup').classList.add('hidden');
+                document.getElementById('vault-content').classList.remove('hidden');
+            } else {
+                alert("කේතයට අවම වශයෙන් අකුරු/ඉලක්කම් 4ක් තිබිය යුතුය.");
             }
         }
 
         document.getElementById('vault-input').onchange = async function(e) {
-            const gallery = document.getElementById('vault-gallery');
+            playSound();
             const files = Array.from(e.target.files);
+            const transaction = db.transaction(["files"], "readwrite");
+            const store = transaction.objectStore("files");
+
             for(let file of files) {
-                const data = await readFile(file);
-                const item = document.createElement('div');
-                item.className = 'file-item';
-                item.innerHTML = `<span>Hidden File</span> <button onclick="playSound(); this.parentElement.remove()">Remove</button>`;
-                gallery.appendChild(item);
+                const dataDataURL = await readFileAsDataURL(file);
+                const fileRecord = {
+                    name: file.name,
+                    type: file.type,
+                    data: dataDataURL
+                };
+                store.add(fileRecord);
             }
+
+            transaction.oncomplete = function() {
+                alert("Files සාර්ථකව Vault එක තුල ස්ථිරවම සඟවන ලදී!");
+                loadVaultFiles();
+            };
         };
 
+        function loadVaultFiles() {
+            const gallery = document.getElementById('vault-gallery');
+            gallery.innerHTML = "";
+
+            if (!db) return;
+            const tx = db.transaction("files", "readonly");
+            const store = tx.objectStore("files");
+            const request = store.openCursor();
+
+            request.onsuccess = function(e) {
+                const cursor = e.target.result;
+                if(cursor) {
+                    const record = cursor.value;
+                    const card = document.createElement('div');
+                    card.className = 'vault-card';
+
+                    if(record.type.startsWith('image/')) {
+                        card.innerHTML = `<img src="${record.data}" class="vault-media"><br>
+                                          <button class="delete-btn" onclick="deleteVaultFile(${record.id})">Delete</button>`;
+                    } else if(record.type.startsWith('video/')) {
+                        card.innerHTML = `<video src="${record.data}" controls class="vault-media"></video><br>
+                                          <button class="delete-btn" onclick="deleteVaultFile(${record.id})">Delete</button>`;
+                    }
+                    gallery.appendChild(card);
+                    cursor.continue();
+                }
+            };
+        }
+
+        function deleteVaultFile(id) {
+            playSound();
+            if(confirm("මෙම File එක සම්පූර්ණයෙන්ම මකා දැමීමට අවශ්‍යද?")) {
+                const tx = db.transaction(["files"], "readwrite");
+                const store = tx.objectStore("files");
+                store.delete(id);
+                tx.oncomplete = function() {
+                    loadVaultFiles();
+                };
+            }
+        }
     </script>
 </body>
 </html>
