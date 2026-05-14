@@ -5,116 +5,142 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Nexora Pro Max</title>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background: #0d1117; color: white; margin: 0; text-align: center; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #0d1117; color: white; margin: 0; text-align: center; }
         .container { padding: 20px; max-width: 500px; margin: auto; }
+        h2 { color: #58a6ff; }
+        .login-box { background: #161b22; padding: 30px; border-radius: 20px; border: 1px solid #30363d; margin-top: 50px; }
+        input, textarea { width: 85%; padding: 12px; margin: 10px 0; border-radius: 10px; border: 1px solid #30363d; background: #0d1117; color: white; }
+        .btn { background: #238636; color: white; padding: 15px; border: none; border-radius: 10px; width: 100%; cursor: pointer; font-weight: bold; font-size: 16px; transition: 0.3s; }
+        .btn:hover { background: #2ea043; transform: scale(1.02); }
+        
+        #main-ui, #vault-ui, #news-ui, #app-window { display: none; }
+        
         .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; }
         .item { background: #161b22; padding: 20px; border-radius: 15px; border: 1px solid #30363d; cursor: pointer; transition: 0.3s; }
-        .item:hover { transform: scale(1.05); border-color: #58a6ff; }
-        input, textarea { width: 85%; padding: 12px; margin: 10px 0; border-radius: 10px; border: 1px solid #30363d; background: #0d1117; color: white; }
-        .btn { background: #238636; color: white; padding: 15px; border: none; border-radius: 10px; width: 90%; cursor: pointer; font-weight: bold; }
-        
-        #app-window { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 1000; }
-        iframe { width: 100%; height: calc(100% - 50px); border: none; }
-        #vault-ui, #news-ui, #main-ui { display: none; }
+        .item:hover { border-color: #58a6ff; background: #1f242c; }
+
+        /* Browser Frame Style */
+        #app-window { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0d1117; z-index: 2000; }
+        .win-header { background: #161b22; padding: 10px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #30363d; }
+        iframe { width: 100%; height: calc(100% - 55px); border: none; background: white; }
     </style>
 </head>
 <body>
 
-<audio id="bgMusic" loop>
-    <source src="parano.mp3" type="audio/mpeg">
-</audio>
+    <audio id="bgMusic" loop>
+        <source src="parano.mp3" type="audio/mpeg">
+    </audio>
 
-<div id="login-screen" class="container" style="margin-top: 100px;">
-    <h2>Nexora Pro Max</h2>
-    <input type="text" id="uname" placeholder="ඔබේ නම ලියන්න...">
-    <button class="btn" onclick="startApp()">START APP</button>
-</div>
-
-<div id="main-ui" class="container">
-    <h3>ආයුබෝවන්, <span id="user"></span>!</h3>
-    <div class="grid">
-        <div class="item" onclick="openApp('https://gemini.google.com/app')">🤖 Gemini AI</div>
-        <div class="item" onclick="openApp('https://www.ilovepdf.com/jpg_to_pdf')">📄 Image to PDF</div>
-        <div class="item" onclick="openApp('https://www.y2mate.com')">🎵 Download Songs</div>
-        <div class="item" onclick="showVault()">🔒 Private Vault</div>
-        <div class="item" onclick="showNews()" style="grid-column: span 2; background: #21262d;">📰 Daily Tech News</div>
+    <div id="login-screen" class="container">
+        <div class="login-box">
+            <h2>Nexora Pro Max</h2>
+            <p>ඇප් එකට ඇතුළු වීමට ඔබේ නම ලියන්න</p>
+            <input type="text" id="uname" placeholder="ඔබේ නම මෙතන ලියන්න...">
+            <button class="btn" onclick="startApp()">START APP</button>
+        </div>
     </div>
-    <button class="btn" style="background:#25d366; margin-top:20px;" onclick="window.open('https://whatsapp.com/channel/0029Vb7asEM9hXF90ZoOX12H')">Tech Sinhala WhatsApp</button>
-    <button class="btn" style="background:#ff0000; margin-top:10px;" onclick="window.open('https://youtube.com/@NexoraLab-y8j')">YouTube Channel</button>
-</div>
 
-<div id="app-window">
-    <div style="background:#161b22; padding:10px; display:flex; justify-content:space-between;">
-        <span style="color:white;">Nexora Browser</span>
-        <button onclick="closeApp()" style="background:red; color:white; border:none; border-radius:5px; padding:5px 10px;">Back</button>
+    <div id="main-ui" class="container">
+        <h3>ආයුබෝවන්, <span id="user-display" style="color:#58a6ff;"></span>!</h3>
+        <img src="profile.jpg" style="width:100%; border-radius:15px; border:1px solid #30363d;" alt="Banner">
+
+        <div class="grid">
+            <div class="item" onclick="openInternal('https://gemini.google.com/app')">🤖 Gemini AI</div>
+            <div class="item" onclick="openInternal('https://www.ilovepdf.com/jpg_to_pdf')">📄 PDF Tool</div>
+            <div class="item" onclick="openInternal('https://www.y2mate.com')">🎵 Download Songs</div>
+            <div class="item" onclick="showVault()">🔒 Private Vault</div>
+            <div class="item" onclick="showNews()" style="grid-column: span 2; background: #21262d;">📰 Daily Tech News</div>
+        </div>
+
+        <button class="btn" style="background:#25d366; margin-top:20px;" onclick="window.open('https://whatsapp.com/channel/0029Vb7asEM9hXF90ZoOX12H')">WhatsApp Channel</button>
+        <button class="btn" style="background:#ff0000; margin-top:10px;" onclick="window.open('https://youtube.com/@NexoraLab-y8j')">YouTube Channel</button>
     </div>
-    <iframe id="app-frame" src=""></iframe>
-</div>
 
-<div id="vault-ui" class="container">
-    <h3>Private Vault 🔒</h3>
-    <textarea id="vault-input" placeholder="ඔබේ රහස් මෙතන ලියන්න..."></textarea>
-    <button class="btn" onclick="saveNote()">Save Note</button>
-    <button class="btn" style="background:gray; margin-top:10px;" onclick="exitToMain('vault-ui')">Back</button>
-    <div id="saved-notes" style="margin-top:20px; text-align:left; border-top:1px solid #333; padding-top:10px;"></div>
-</div>
-
-<div id="news-ui" class="container">
-    <h3>Tech News 📰</h3>
-    <div id="news-content" style="text-align:left; font-size:14px;">
-        <p>• පන්සිළු, මෙතනට අපි API එකක් නැතුව පුවත් ගේමු...</p>
-        <p>• Apple සමාගම අලුත්ම iPhone එක හඳුන්වා දෙයි.</p>
-        <p>• AI තාක්ෂණය ලෝකය වේගයෙන් වෙනස් කරයි.</p>
+    <div id="app-window">
+        <div class="win-header">
+            <span style="font-size:14px;">Nexora Secure Browser</span>
+            <button onclick="closeInternal()" style="background:#da3633; color:white; border:none; padding:5px 15px; border-radius:5px; cursor:pointer;">Back</button>
+        </div>
+        <iframe id="app-frame" src=""></iframe>
     </div>
-    <button class="btn" style="background:gray; margin-top:20px;" onclick="exitToMain('news-ui')">Back</button>
-</div>
 
-<script>
-    function startApp() {
-        let n = document.getElementById("uname").value;
-        if(n) {
-            let music = document.getElementById("bgMusic");
-            music.play(); // සින්දුව පටන් ගනී
-            document.getElementById("login-screen").style.display = "none";
-            document.getElementById("main-ui").style.display = "block";
-            document.getElementById("user").innerText = n;
-        } else { alert("නම ඇතුළත් කරන්න!"); }
-    }
+    <div id="vault-ui" class="container">
+        <h3>Private Vault 🔒</h3>
+        <textarea id="vault-input" placeholder="ඔබේ රහස් නෝට්ස් මෙතන ලියන්න..."></textarea>
+        <button class="btn" onclick="saveNote()">Save Secret Note</button>
+        <button class="btn" style="background:#30363d; margin-top:10px;" onclick="hideSection('vault-ui')">Back</button>
+        <div id="saved-note-display" style="margin-top:20px; padding:10px; background:#161b22; border-radius:10px; text-align:left; border: 1px dashed #58a6ff;"></div>
+    </div>
 
-    function openApp(url) {
-        document.getElementById("app-frame").src = url;
-        document.getElementById("app-window").style.display = "block";
-    }
+    <div id="news-ui" class="container">
+        <h3>Daily Tech News 📰</h3>
+        <div style="text-align:left; background:#161b22; padding:15px; border-radius:10px;">
+            <p>• Apple සමාගම නව AI විශේෂාංග හඳුන්වා දෙයි.</p>
+            <p>• ලෝකයේ වේගවත්ම පරිගණක චිප් එක නිපදවයි.</p>
+            <p>• රොබෝ තාක්ෂණය වෛද්‍ය ක්ෂේත්‍රයට එක් වෙයි.</p>
+        </div>
+        <button class="btn" style="background:#30363d; margin-top:20px;" onclick="hideSection('news-ui')">Back</button>
+    </div>
 
-    function closeApp() {
-        document.getElementById("app-window").style.display = "none";
-        document.getElementById("app-frame").src = "";
-    }
+    <script>
+        // Start App and Music
+        function startApp() {
+            let name = document.getElementById("uname").value;
+            if(name.trim() !== "") {
+                // Music Autoplay Fix
+                let music = document.getElementById("bgMusic");
+                music.load(); 
+                music.play().catch(function(error) {
+                    console.log("Autoplay blocked: " + error);
+                });
 
-    function showVault() {
-        if(prompt("මුරපදය:") === "1234") {
-            document.getElementById("main-ui").style.display = "none";
-            document.getElementById("vault-ui").style.display = "block";
-            document.getElementById("saved-notes").innerText = localStorage.getItem("note") || "සේව් කළ දත්ත නැත.";
+                document.getElementById("login-screen").style.display = "none";
+                document.getElementById("main-ui").style.display = "block";
+                document.getElementById("user-display").innerText = name;
+            } else {
+                alert("කරුණාකර නම ඇතුළත් කරන්න!");
+            }
         }
-    }
 
-    function saveNote() {
-        let note = document.getElementById("vault-input").value;
-        localStorage.setItem("note", note);
-        document.getElementById("saved-notes").innerText = note;
-        alert("Saved!");
-    }
+        // Internal Browser Functions
+        function openInternal(url) {
+            document.getElementById("app-frame").src = url;
+            document.getElementById("app-window").style.display = "block";
+        }
 
-    function showNews() {
-        document.getElementById("main-ui").style.display = "none";
-        document.getElementById("news-ui").style.display = "block";
-    }
+        function closeInternal() {
+            document.getElementById("app-window").style.display = "none";
+            document.getElementById("app-frame").src = "";
+        }
 
-    function exitToMain(id) {
-        document.getElementById(id).style.display = "none";
-        document.getElementById("main-ui").style.display = "block";
-    }
-</script>
+        // Vault logic
+        function showVault() {
+            let pass = prompt("මුරපදය (Password) ඇතුළත් කරන්න:");
+            if(pass === "1234") {
+                document.getElementById("main-ui").style.display = "none";
+                document.getElementById("vault-ui").style.display = "block";
+                document.getElementById("saved-note-display").innerText = localStorage.getItem("nexora_note") || "තවම සටහන් කිසිවක් නැත.";
+            } else {
+                alert("මුරපදය වැරදියි!");
+            }
+        }
+
+        function saveNote() {
+            let note = document.getElementById("vault-input").value;
+            localStorage.setItem("nexora_note", note);
+            document.getElementById("saved-note-display").innerText = note;
+            alert("සාර්ථකව සුරැකුණා!");
+        }
+
+        function showNews() {
+            document.getElementById("main-ui").style.display = "none";
+            document.getElementById("news-ui").style.display = "block";
+        }
+
+        function hideSection(id) {
+            document.getElementById(id).style.display = "none";
+            document.getElementById("main-ui").style.display = "block";
+        }
+    </script>
 </body>
 </html>
