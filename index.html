@@ -5,196 +5,159 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Nexora Pro Max</title>
     <style>
-        /* General Styles */
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            overflow: hidden;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            color: white;
-            transition: background 0.5s;
-        }
-
-        /* Backgrounds */
-        .login-bg { background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); }
-        .main-bg { background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%); }
+        /* General & Backgrounds */
+        body { font-family: 'Segoe UI', sans-serif; margin: 0; overflow: hidden; display: flex; justify-content: center; align-items: center; height: 100vh; color: white; transition: background 0.5s; }
+        .login-bg { background: linear-gradient(45deg, #0f2027, #203a43, #2c5364); }
+        .main-bg { background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d); }
 
         /* Snow Animation */
-        .snow-container {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            pointer-events: none;
-            z-index: 999;
-        }
-        .snowflake {
-            position: absolute;
-            top: -10px;
-            color: white;
-            font-size: 1em;
-            user-select: none;
-            animation: fall linear infinite;
-        }
-        @keyframes fall {
-            to { transform: translateY(105vh); }
-        }
+        #snow-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 999; display: none; }
+        .snowflake { position: absolute; top: -10px; color: white; font-size: 1.2em; user-select: none; animation: fall linear infinite; }
+        @keyframes fall { to { transform: translateY(105vh); } }
 
-        /* Container & Cards */
-        .container {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            padding: 25px;
-            border-radius: 20px;
-            width: 90%;
-            max-width: 400px;
-            text-align: center;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
-            border: 1px solid rgba(255,255,255,0.1);
-            z-index: 10;
-        }
+        /* Containers */
+        .container { background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(15px); padding: 30px; border-radius: 25px; text-align: center; width: 85%; max-width: 400px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.2); z-index: 10; }
+        .hidden { display: none !important; }
 
-        input, button {
-            width: 100%;
-            padding: 12px;
-            margin: 10px 0;
-            border-radius: 10px;
-            border: none;
-            outline: none;
-        }
-        input { background: rgba(255,255,255,0.2); color: white; text-align: center; }
-        button { background: #007bff; color: white; font-weight: bold; cursor: pointer; transition: 0.3s; }
-        button:hover { background: #0056b3; transform: scale(1.02); }
+        input, button { width: 100%; padding: 12px; margin: 10px 0; border-radius: 12px; border: none; outline: none; box-sizing: border-box; }
+        input { background: rgba(255,255,255,0.2); color: white; text-align: center; font-size: 16px; }
+        button { background: #2575fc; color: white; font-weight: bold; cursor: pointer; transition: 0.3s; font-size: 16px; }
+        button:hover { background: #6a11cb; transform: scale(1.05); }
 
-        .hidden { display: none; }
+        /* Feature Grid */
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px; }
+        .grid-item { background: rgba(0,0,0,0.4); padding: 15px; border-radius: 15px; cursor: pointer; font-size: 0.9em; border: 1px solid rgba(255,255,255,0.1); }
+        .grid-item:hover { border-color: white; background: rgba(0,0,0,0.6); }
 
-        /* Grid for features */
-        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; }
-        .grid-item {
-            background: rgba(255,255,255,0.15);
-            padding: 15px;
-            border-radius: 12px;
-            cursor: pointer;
-            font-size: 0.9em;
-        }
-
-        /* Vault & News Styles */
-        .vault-section, .news-section {
-            background: #161b22;
-            padding: 15px;
-            border-radius: 15px;
-            margin-top: 10px;
-            text-align: left;
-        }
-        .news-img { width: 100%; border-radius: 10px; margin-bottom: 10px; }
+        /* Vault Area */
+        .vault-area { background: #0d1117; padding: 15px; border-radius: 15px; text-align: left; margin-top: 10px; }
+        textarea { width: 100%; height: 80px; background: #161b22; color: #00ff00; border: 1px solid #30363d; border-radius: 8px; padding: 8px; box-sizing: border-box; font-family: monospace; }
+        #media-preview { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; max-height: 150px; overflow-y: auto; }
+        .preview-item { width: 70px; height: 70px; object-fit: cover; border-radius: 5px; border: 1px solid #555; }
     </style>
 </head>
 <body class="login-bg">
 
-    <div class="snow-container" id="snow"></div>
+    <div id="snow-container"></div>
+
+    <audio id="bgMusic" loop>
+        <source src="parano.mp3" type="audio/mpeg">
+    </audio>
 
     <div id="login-screen" class="container">
-        <h2>Nexora Pro</h2>
+        <h2 style="margin-top:0;">Nexora Pro</h2>
         <p>ඇප් එකට ඇතුළු වීමට නම ලියන්න</p>
         <input type="text" id="uname" placeholder="ඔබේ නම...">
         <button onclick="startApp()">START APP</button>
     </div>
 
     <div id="main-screen" class="container hidden">
-        <h3 id="welcome-msg">ආයුබෝවන්!</h3>
+        <h2 id="welcome-text" style="margin-top:0;">ආයුබෝවන්!</h2>
         
         <div class="grid">
-            <div class="grid-item" onclick="openGemini()">🤖 Gemini AI</div>
-            <div class="grid-item" onclick="showSection('vault')">🔒 Private Vault</div>
-            <div class="grid-item" onclick="window.open('https://youtube.com/@NexoraLab')">📺 YouTube</div>
-            <div class="grid-item" onclick="window.open('https://whatsapp.com/channel/0029Va62v2890x2z')">💬 WhatsApp</div>
+            <div class="grid-item" onclick="openVault()">🔒 Private Vault</div>
+            <div class="grid-item" onclick="window.open('https://gemini.google.com/', '_blank')">🤖 Gemini AI</div>
+            <div class="grid-item" onclick="window.open('https://youtube.com/@NexoraLab-y8j', '_blank')">📺 YouTube</div>
+            <div class="grid-item" onclick="window.open('https://whatsapp.com/channel/0029Vb7asEM9hXF90ZoOX12H', '_blank')">💬 WhatsApp</div>
         </div>
-
-        <button onclick="showSection('news')" style="background: #28a745;">📰 Daily Tech News</button>
+        
+        <div style="margin-top: 20px; font-size: 0.85em; background: rgba(0,0,0,0.3); padding: 10px; border-radius: 10px;">
+            <b>Daily Tech News:</b><br>
+            අද දවසේ අලුත්ම තාක්ෂණික තොරතුරු මෙතැනින් බලන්න.
+        </div>
     </div>
 
-    <div id="vault-section" class="container hidden">
+    <div id="vault-screen" class="container hidden">
         <h3>🔒 Private Vault</h3>
-        <div class="vault-section">
-            <p>📝 Code Safe</p>
-            <textarea id="code-input" style="width:90%; height:60px; border-radius:5px; padding:5px;" placeholder="ඔබේ කේතයන් මෙහි සුරකින්න..."></textarea>
-            <button onclick="saveCode()" style="padding:5px; font-size:0.8em;">Save Code</button>
+        <div class="vault-area">
+            <p style="margin:0 0 5px 0; font-size:0.85em;">Secret Code Saver:</p>
+            <textarea id="code-input" placeholder="ඔබේ code එක මෙතන paste කරන්න..."></textarea>
+            <button onclick="saveCode()" style="background: #238636; padding:8px; font-size:14px;">Save Code</button>
+            
+            <hr style="border: 0.5px solid #333; margin: 15px 0;">
+            
+            <p style="margin:0 0 5px 0; font-size:0.85em;">Private Gallery (Images/Videos):</p>
+            <input type="file" id="media-upload" multiple accept="image/*,video/*" style="font-size: 0.75em;">
+            <div id="media-preview"></div>
         </div>
-        <div class="vault-section">
-            <p>🖼️ Media Vault</p>
-            <input type="file" id="media-upload" multiple style="font-size:0.8em;">
-            <p style="font-size:0.7em;">ඡායාරූප සහ වීඩියෝ මෙහි තෝරාගන්න.</p>
-        </div>
-        <button onclick="goBack()" style="background: #6c757d;">Back</button>
-    </div>
-
-    <div id="news-section" class="container hidden">
-        <h3>📰 Daily Tech News</h3>
-        <div class="news-section">
-            <img src="https://img.freepik.com/free-photo/representation-user-experience-interface-design_23-2150165980.jpg" class="news-img">
-            <p><b>AI තාක්ෂණයේ නවතම පෙරළිය</b></p>
-            <p style="font-size:0.8em;">කෘතිම බුද්ධිය (AI) මගින් දැන් මිනිස් කටහඬ වඩාත් තාත්විකව අනුකරණය කළ හැකි නව මෙවලම් හඳුන්වා දී ඇත.</p>
-        </div>
-        <button onclick="goBack()" style="background: #6c757d;">Back</button>
+        <button onclick="goBack()" style="background: #da3633; margin-top: 15px;">Back to Menu</button>
     </div>
 
     <script>
-        // Start App
+        // Snow Animation
+        function createSnow() {
+            const container = document.getElementById('snow-container');
+            container.style.display = "block";
+            for (let i = 0; i < 40; i++) {
+                let snow = document.createElement('div');
+                snow.className = 'snowflake';
+                snow.innerHTML = '❄';
+                snow.style.left = Math.random() * 100 + 'vw';
+                snow.style.animationDuration = (Math.random() * 3 + 2) + 's';
+                snow.style.opacity = Math.random();
+                container.appendChild(snow);
+            }
+        }
+
         function startApp() {
-            const name = document.getElementById("uname").value;
-            if(name.trim() !== "") {
-                document.getElementById("login-screen").classList.add("hidden");
-                document.getElementById("main-screen").classList.remove("hidden");
+            let name = document.getElementById('uname').value;
+            if (name.trim() !== "") {
+                // Music Autoplay & Background Change
+                let music = document.getElementById('bgMusic');
+                music.play().catch(e => console.log("Music blocked"));
+                
+                document.getElementById('welcome-text').innerText = "ආයුබෝවන්, " + name + "!";
+                document.getElementById('login-screen').classList.add('hidden');
+                document.getElementById('main-screen').classList.remove('hidden');
                 document.body.className = "main-bg";
-                document.getElementById("welcome-msg").innerText = "ආයුබෝවන්, " + name + "!";
                 createSnow();
             } else {
                 alert("කරුණාකර නම ඇතුළත් කරන්න!");
             }
         }
 
-        // Snowflakes Creation
-        function createSnow() {
-            const snowContainer = document.getElementById("snow");
-            for (let i = 0; i < 50; i++) {
-                let flake = document.createElement("div");
-                flake.className = "snowflake";
-                flake.innerText = "❄";
-                flake.style.left = Math.random() * 100 + "vw";
-                flake.style.animationDuration = (Math.random() * 3 + 2) + "s";
-                flake.style.opacity = Math.random();
-                snowContainer.appendChild(flake);
+        function openVault() {
+            let password = prompt("Password එක ඇතුළත් කරන්න:");
+            if (password === "1234") {
+                document.getElementById('main-screen').classList.add('hidden');
+                document.getElementById('vault-screen').classList.remove('hidden');
+            } else {
+                alert("වැරදි Password එකක්!");
             }
         }
 
-        function openGemini() {
-            window.open("https://gemini.google.com/app", "_blank");
-        }
-
-        function showSection(id) {
-            document.getElementById("main-screen").classList.add("hidden");
-            document.getElementById(id + "-section").classList.remove("hidden");
-        }
-
         function goBack() {
-            document.getElementById("vault-section").classList.add("hidden");
-            document.getElementById("news-section").classList.add("hidden");
-            document.getElementById("main-screen").classList.remove("hidden");
+            document.getElementById('vault-screen').classList.add('hidden');
+            document.getElementById('main-screen').classList.remove('hidden');
         }
 
         function saveCode() {
-            const code = document.getElementById("code-input").value;
-            localStorage.setItem("saved_code", code);
-            alert("කේතය සාර්ථකව සුරැකුණි!");
+            let code = document.getElementById('code-input').value;
+            localStorage.setItem('saved_code', code);
+            alert("Code එක ආරක්ෂිතව save කළා!");
         }
 
-        // Load saved code on start
+        // Gallery logic
+        document.getElementById('media-upload').addEventListener('change', function(e) {
+            const preview = document.getElementById('media-preview');
+            Array.from(e.target.files).forEach(file => {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    let el = file.type.startsWith('image/') ? document.createElement('img') : document.createElement('video');
+                    if (file.type.startsWith('video/')) el.controls = true;
+                    el.src = event.target.result;
+                    el.className = 'preview-item';
+                    preview.appendChild(el);
+                };
+                reader.readAsDataURL(file);
+            });
+            alert("ගොනු Vault එකට එක් කළා. දැන් ඔබට Gallery එකෙන් මේවා මකා දැමිය හැකියි.");
+        });
+
         window.onload = function() {
-            const saved = localStorage.getItem("saved_code");
-            if(saved) document.getElementById("code-input").value = saved;
-        }
+            let saved = localStorage.getItem('saved_code');
+            if (saved) document.getElementById('code-input').value = saved;
+        };
     </script>
 </body>
 </html>
