@@ -5,68 +5,56 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Nexora Pro Max</title>
     <style>
-        body { font-family: sans-serif; background: #0d1117; color: white; margin: 0; overflow-x: hidden; }
-        .container { padding: 20px; text-align: center; }
-        .btn { background: #238636; color: white; padding: 15px; border: none; border-radius: 10px; width: 100%; margin-top: 10px; cursor: pointer; }
-        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; }
-        .item { background: #161b22; padding: 20px; border-radius: 15px; border: 1px solid #30363d; cursor: pointer; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #0d1117; color: white; margin: 0; text-align: center; }
+        .container { padding: 20px; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; }
+        .item { background: #161b22; padding: 25px; border-radius: 15px; border: 1px solid #30363d; cursor: pointer; transition: 0.3s; }
+        .item:hover { background: #1f242c; transform: translateY(-5px); }
+        .btn-full { background: #238636; color: white; padding: 15px; border: none; border-radius: 10px; width: 100%; margin-top: 10px; cursor: pointer; font-weight: bold; }
         
-        /* ඇප් එක ඇතුළේ පෙන්වන Window එක */
-        #app-window {
-            display: none;
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background: white;
-            z-index: 1000;
-        }
-        #window-header {
-            background: #161b22;
-            padding: 10px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        iframe { width: 100%; height: calc(100% - 50px); border: none; }
-        #main-content, #login-screen { padding: 20px; }
+        /* Modal Window */
+        #app-window { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 1000; }
+        #window-header { background: #161b22; padding: 12px; display: flex; justify-content: space-between; align-items: center; }
+        iframe { width: 100%; height: calc(100% - 55px); border: none; }
+        
+        /* Vault Styles */
+        #vault-ui { display: none; padding: 20px; }
+        textarea { width: 90%; height: 150px; border-radius: 10px; padding: 10px; margin-bottom: 10px; }
     </style>
 </head>
 <body>
 
-<div id="login-screen">
+<div id="main-ui" class="container">
     <h2>Nexora Pro Max</h2>
-    <input type="text" id="uname" placeholder="ඔබේ නම..." style="width:80%; padding:10px; border-radius:5px;">
-    <button class="btn" onclick="login()">Start App</button>
-</div>
-
-<div id="main-content" style="display:none;">
-    <h3>ආයුබෝවන් <span id="user"></span></h3>
     <div class="grid">
-        <div class="item" onclick="openApp('https://gemini.google.com/app')">🤖 Gemini</div>
-        <div class="item" onclick="openApp('https://www.ilovepdf.com/jpg_to_pdf')">📄 PDF Tool</div>
-        <div class="item" onclick="openApp('https://www.google.com/search?q=song+download')">🎵 Search Songs</div>
-        <div class="item" onclick="openVault()">🔒 Vault</div>
+        <div class="item" onclick="openApp('https://gemini.google.com/app')">🤖 Gemini AI</div>
+        <div class="item" onclick="openApp('https://www.ilovepdf.com/jpg_to_pdf')">📄 Images to PDF</div>
+        <div class="item" onclick="openApp('https://www.y2mate.com')">🎵 Download Songs</div>
+        <div class="item" onclick="showVault()">🔒 Private Vault</div>
     </div>
+    
+    <button class="btn-full" style="background:#25d366;" onclick="window.open('https://whatsapp.com/channel/0029Vb7asEM9hXF90ZoOX12H')">Tech Sinhala WhatsApp</button>
+    <button class="btn-full" style="background:#ff0000; margin-top:15px;" onclick="window.open('https://youtube.com/@NexoraLab-y8j')">YouTube Channel</button>
 </div>
 
 <div id="app-window">
     <div id="window-header">
-        <span style="color:white; margin-left:10px;">Nexora Browser</span>
-        <button onclick="closeApp()" style="background:red; color:white; border:none; padding:5px 15px; border-radius:5px;">Back</button>
+        <span style="color:white;">Nexora Browser</span>
+        <button onclick="closeApp()" style="background:#da3633; color:white; border:none; padding:8px 15px; border-radius:5px;">Back</button>
     </div>
     <iframe id="app-frame" src=""></iframe>
 </div>
 
-<script>
-    function login() {
-        let n = document.getElementById("uname").value;
-        if(n) {
-            document.getElementById("login-screen").style.display = "none";
-            document.getElementById("main-content").style.display = "block";
-            document.getElementById("user").innerText = n;
-        }
-    }
+<div id="vault-ui">
+    <h3>Private Vault 🔒</h3>
+    <p>ඔබේ රහස් නෝට්ස් මෙතන සේව් කරන්න:</p>
+    <textarea id="vault-input" placeholder="මෙතන ලියන්න..."></textarea><br>
+    <button class="btn-full" onclick="saveNote()">Save Note</button>
+    <button class="btn-full" style="background:#da3633;" onclick="exitVault()">Exit Vault</button>
+    <div id="saved-notes" style="margin-top:20px; text-align:left; background:#161b22; padding:10px; border-radius:10px;"></div>
+</div>
 
+<script>
     function openApp(url) {
         document.getElementById("app-frame").src = url;
         document.getElementById("app-window").style.display = "block";
@@ -77,12 +65,36 @@
         document.getElementById("app-frame").src = "";
     }
 
-    function openVault() {
-        let p = prompt("Password එක ගහන්න:");
-        if(p === "1234") {
-            alert("සාර්ථකයි! ඔයාගේ රහස් මෙතන තියෙනවා.");
+    // Vault Functions
+    function showVault() {
+        let pass = prompt("මුරපදය ඇතුළත් කරන්න:");
+        if(pass === "1234") {
+            document.getElementById("main-ui").style.display = "none";
+            document.getElementById("vault-ui").style.display = "block";
+            loadNotes();
         } else {
-            alert("වැරදියි!");
+            alert("වැරදි මුරපදයක්!");
+        }
+    }
+
+    function exitVault() {
+        document.getElementById("vault-ui").style.display = "none";
+        document.getElementById("main-ui").style.display = "block";
+    }
+
+    function saveNote() {
+        let note = document.getElementById("vault-input").value;
+        if(note) {
+            localStorage.setItem("mySecretNote", note);
+            alert("නෝට් එක සාර්ථකව සේව් කළා!");
+            loadNotes();
+        }
+    }
+
+    function loadNotes() {
+        let saved = localStorage.getItem("mySecretNote");
+        if(saved) {
+            document.getElementById("saved-notes").innerHTML = "<b>ඔබේ නෝට් එක:</b><br>" + saved;
         }
     }
 </script>
