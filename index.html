@@ -90,13 +90,13 @@
             object-fit: cover;
         }
 
-        h2, h3 {
+        h2, h3, h4 {
             margin-bottom: 20px;
             font-weight: 600;
             letter-spacing: 0.5px;
         }
 
-        input[type="text"], input[type="password"] {
+        input[type="text"] {
             width: 100%;
             padding: 14px;
             margin-bottom: 15px;
@@ -130,21 +130,10 @@
             margin-bottom: 10px;
         }
 
-        .btn:active {
-            transform: scale(0.98);
-        }
+        .btn:active { transform: scale(0.98); }
+        .btn-secondary { background: linear-gradient(135deg, #4f46e5, #3b82f6); box-shadow: 0 5px 15px rgba(59, 130, 246, 0.3); }
+        .btn-danger { background: linear-gradient(135deg, #dc2626, #b91c1c); box-shadow: 0 5px 15px rgba(220, 38, 38, 0.3); }
 
-        .btn-secondary {
-            background: linear-gradient(135deg, #4f46e5, #3b82f6);
-            box-shadow: 0 5px 15px rgba(59, 130, 246, 0.3);
-        }
-
-        .btn-danger {
-            background: linear-gradient(135deg, #dc2626, #b91c1c);
-            box-shadow: 0 5px 15px rgba(220, 38, 38, 0.3);
-        }
-
-        /* Dashboard Grid Layout */
         .grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -172,22 +161,56 @@
             border-color: rgba(255,255,255,0.2);
         }
 
-        .grid-item span {
-            font-size: 24px;
-        }
+        .grid-item span { font-size: 24px; }
 
-        /* Vault Images Gallery Styles */
-        .vault-gallery {
+        /* Vault & PDF History Lists */
+        .vault-gallery, .pdf-list-container {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 10px;
             margin: 15px 0;
-            max-height: 200px;
+            max-height: 180px;
             overflow-y: auto;
             padding: 5px;
             border: 1px solid rgba(255,255,255,0.1);
             border-radius: 12px;
             background: rgba(0,0,0,0.2);
+        }
+
+        .pdf-list-container {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            max-height: 150px;
+            text-align: left;
+        }
+
+        .pdf-history-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255,255,255,0.08);
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 13px;
+        }
+
+        .pdf-history-item span {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 180px;
+        }
+
+        .pdf-share-btn {
+            background: #00ffcc;
+            color: black;
+            border: none;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 11px;
+            cursor: pointer;
         }
 
         .vault-item {
@@ -196,9 +219,10 @@
             border-radius: 8px;
             overflow: hidden;
             border: 1px solid rgba(255,255,255,0.2);
+            background: #000;
         }
 
-        .vault-item img {
+        .vault-item img, .vault-item video {
             width: 100%;
             height: 100%;
             object-fit: cover;
@@ -209,16 +233,16 @@
             bottom: 0;
             left: 0;
             width: 100%;
-            background: rgba(0, 0, 0, 0.7);
+            background: rgba(0, 0, 0, 0.75);
             color: #00ffcc;
             font-size: 11px;
-            padding: 3px 0;
+            padding: 4px 0;
             border: none;
             cursor: pointer;
             font-weight: bold;
+            letter-spacing: 0.5px;
         }
 
-        /* File input styling */
         .file-box {
             border: 2px dashed rgba(255,255,255,0.2);
             padding: 20px;
@@ -228,9 +252,7 @@
             background: rgba(255,255,255,0.02);
         }
 
-        .file-box:hover {
-            border-color: #ff4b2b;
-        }
+        .file-box:hover { border-color: #ff4b2b; }
 
         #pdf-preview-gallery {
             display: flex;
@@ -245,6 +267,7 @@
             height: 50px;
             object-fit: cover;
             border-radius: 6px;
+            border: 1px solid rgba(255,255,255,0.3);
         }
     </style>
 </head>
@@ -272,18 +295,10 @@
         <h3 id="welcome-text">ආයුබෝවන්!</h3>
         
         <div class="grid">
-            <div class="grid-item" onclick="openTool('youtube')">
-                <span>📺</span>YouTube
-            </div>
-            <div class="grid-item" onclick="openTool('whatsapp')">
-                <span>💬</span>WhatsApp
-            </div>
-            <div class="grid-item" onclick="openTool('pdf-converter')">
-                <span>📄</span>Image to PDF
-            </div>
-            <div class="grid-item" onclick="checkVaultAccess()">
-                <span>🔒</span>Private Vault
-            </div>
+            <div class="grid-item" onclick="openTool('youtube')"><span>📺</span>YouTube</div>
+            <div class="grid-item" onclick="openTool('whatsapp')"><span>💬</span>WhatsApp</div>
+            <div class="grid-item" onclick="openTool('pdf-converter')"><span>📄</span>Image to PDF</div>
+            <div class="grid-item" onclick="checkVaultAccess()"><span>🔒</span>Private Vault</div>
         </div>
     </div>
 
@@ -295,16 +310,20 @@
         </div>
         <div id="pdf-preview-gallery"></div>
         <button class="btn" onclick="generatePDF()">Convert to PDF</button>
+        
+        <h4 style="font-size: 14px; text-align: left; margin-top: 10px;">සෑදූ PDF ගොනු:</h4>
+        <div class="pdf-list-container" id="pdfList"></div>
+
         <button class="btn btn-secondary" onclick="backToMenu('pdf-screen')">Back to Menu</button>
     </div>
 
     <div id="vault-screen" class="container hidden">
         <h3>🔒 Private Vault</h3>
-        <p style="font-size: 13px; margin-bottom: 10px; color: #ccc;">රහසිගත ඡායාරූප මෙතැනින් සුරකින්න සහ Share කරන්න.</p>
+        <p style="font-size: 13px; margin-bottom: 10px; color: #ccc;">රහසිගත ඡායාරූප සහ වීඩියෝ සුරකින්න / Share කරන්න.</p>
         
         <div class="file-box" onclick="document.getElementById('vault-input').click()">
-            Vault එකට එක් කරන්න
-            <input type="file" id="vault-input" accept="image/*" multiple class="hidden" onchange="saveToVault()">
+            Vault එකට එක් කරන්න (Photo/Video)
+            <input type="file" id="vault-input" accept="image/*,video/*" multiple class="hidden" onchange="saveToVault()">
         </div>
 
         <div class="vault-gallery" id="vaultGallery"></div>
@@ -314,9 +333,7 @@
     </div>
 
     <script>
-        // Sound Effect Button click
         const clickSound = new Audio("https://www.soundjay.com/button/button-16.mp3");
-        let vaultImagesList = [];
 
         // Snow effect generation
         function createSnow() {
@@ -334,7 +351,6 @@
         }
         createSnow();
 
-        // Start App, Enable Background music securely
         function startApp() {
             clickSound.play();
             let user = document.getElementById('username').value.trim();
@@ -342,11 +358,8 @@
             
             document.getElementById('welcome-text').innerText = `ආයුබෝවන්, ${user}!`;
             
-            // Play background music (parano.mp3)
             const bgMusic = document.getElementById('bgMusic');
-            bgMusic.play().catch(() => {
-                console.log("Audio autoplay restricted by browser. Playing on interaction.");
-            });
+            bgMusic.play().catch(() => { console.log("Audio autoplay restricted."); });
 
             document.getElementById('login-screen').classList.add('hidden');
             document.getElementById('main-screen').classList.remove('hidden');
@@ -367,6 +380,7 @@
             } else if(type === 'pdf-converter') {
                 document.getElementById('main-screen').classList.add('hidden');
                 document.getElementById('pdf-screen').classList.remove('hidden');
+                loadPDFList();
             }
         }
 
@@ -377,13 +391,12 @@
             if(code === "1234") {
                 document.getElementById('main-screen').classList.add('hidden');
                 document.getElementById('vault-screen').classList.remove('hidden');
-                loadVaultImages(); // Refresh and show saved images
+                loadVaultImages();
             } else if(code !== null) {
                 alert("වැරදි කේතයකි! නැවත උත්සාහ කරන්න.");
             }
         }
 
-        // Convert selected image to Base64 and save to localStorage
         function saveToVault() {
             const files = document.getElementById('vault-input').files;
             if (files.length === 0) return;
@@ -399,13 +412,12 @@
                         data: e.target.result
                     });
                     localStorage.setItem('vault_images', JSON.stringify(list));
-                    loadVaultImages(); // Update preview
+                    loadVaultImages();
                 };
                 reader.readAsDataURL(file);
             });
         }
 
-        // Render saved images inside Private Vault with Share button
         function loadVaultImages() {
             const gallery = document.getElementById('vaultGallery');
             gallery.innerHTML = "";
@@ -413,7 +425,7 @@
             let list = savedData ? JSON.parse(savedData) : [];
 
             if(list.length === 0) {
-                gallery.innerHTML = `<p style="grid-column: span 3; font-size:12px; color:#aaa; padding:10px;">ලබාදුන් පින්තූර නොමැත.</p>`;
+                gallery.innerHTML = `<p style="grid-column: span 3; font-size:12px; color:#aaa; padding:10px;">ලබාදුන් පින්තූර හෝ වීඩියෝ නොමැත.</p>`;
                 return;
             }
 
@@ -421,25 +433,31 @@
                 let div = document.createElement('div');
                 div.className = 'vault-item';
                 
-                let img = document.createElement('img');
-                img.src = item.data;
+                let mediaElement;
+                if (item.type && item.type.startsWith('video/')) {
+                    mediaElement = document.createElement('video');
+                    mediaElement.src = item.data;
+                    mediaElement.muted = true;
+                    mediaElement.playsInline = true;
+                } else {
+                    mediaElement = document.createElement('img');
+                    mediaElement.src = item.data;
+                }
                 
                 let shareBtn = document.createElement('button');
                 shareBtn.className = 'share-overlay-btn';
                 shareBtn.innerText = 'SHARE';
-                shareBtn.onclick = () => shareVaultImage(item.data, item.name, item.type);
+                shareBtn.onclick = () => shareVaultMedia(item.data, item.name, item.type);
 
-                div.appendChild(img);
+                div.appendChild(mediaElement);
                 div.appendChild(shareBtn);
                 gallery.appendChild(div);
             });
         }
 
-        // Web Share Functionality to share saved vault images to outside apps
-        async function shareVaultImage(base64Data, filename, mimeType) {
+        async function shareVaultMedia(base64Data, filename, mimeType) {
             clickSound.play();
             try {
-                // Convert Base64 back to Blob and File object for sharing
                 const res = await fetch(base64Data);
                 const blob = await res.blob();
                 const file = new File([blob], filename, { type: mimeType });
@@ -447,7 +465,7 @@
                 if (navigator.canShare && navigator.canShare({ files: [file] })) {
                     await navigator.share({
                         files: [file],
-                        title: 'Nexora App Shared Image',
+                        title: 'Nexora Vault Share',
                         text: 'Private Vault එකෙන් Share කරන ලදි.'
                     });
                 } else {
@@ -459,13 +477,13 @@
         }
 
         function clearVault() {
-            if(confirm("සියලුම පින්තූර Vault එකෙන් ඉවත් කිරීමට අවශ්‍යද?")) {
+            if(confirm("සියලුම දේ Vault එකෙන් ඉවත් කිරීමට අවශ්‍යද?")) {
                 localStorage.removeItem('vault_images');
                 loadVaultImages();
             }
         }
 
-        /* --- IMAGE TO PDF CONVERTER LOGIC --- */
+        /* --- IMAGE TO PDF CONVERTER LOGIC WITH HISTORY & SHARE --- */
         function previewPDFImages() {
             const gallery = document.getElementById('pdf-preview-gallery');
             gallery.innerHTML = "";
@@ -509,8 +527,61 @@
                 await promise;
             }
 
-            doc.save("Nexora_Document.pdf");
+            // Save PDF to a DataURL to keep in app history
+            const pdfOutputBase64 = doc.output('datauristring');
+            const pdfName = `Nexora_${Date.now()}.pdf`;
+
+            let savedPDFs = localStorage.getItem('nexora_pdfs');
+            let pdfList = savedPDFs ? JSON.parse(savedPDFs) : [];
+            pdfList.push({ name: pdfName, data: pdfOutputBase64 });
+            localStorage.setItem('nexora_pdfs', JSON.stringify(pdfList));
+
+            doc.save(pdfName);
             alert("PDF එක සාර්ථකව Download විය!");
+            loadPDFList(); // Refresh inside application view
+        }
+
+        function loadPDFList() {
+            const listContainer = document.getElementById('pdfList');
+            listContainer.innerHTML = "";
+            let savedPDFs = localStorage.getItem('nexora_pdfs');
+            let pdfList = savedPDFs ? JSON.parse(savedPDFs) : [];
+
+            if(pdfList.length === 0) {
+                listContainer.innerHTML = `<p style="font-size:12px; color:#aaa; padding:5px;">සෑදූ PDF ගොනු කිසිවක් නොමැත.</p>`;
+                return;
+            }
+
+            pdfList.forEach((pdf, index) => {
+                let div = document.createElement('div');
+                div.className = 'pdf-history-item';
+                div.innerHTML = `
+                    <span>📄 ${pdf.name}</span>
+                    <button class="pdf-share-btn" onclick="sharePDFFile('${pdf.data}', '${pdf.name}')">SHARE</button>
+                `;
+                listContainer.appendChild(div);
+            });
+        }
+
+        async function sharePDFFile(base64Data, filename) {
+            clickSound.play();
+            try {
+                const res = await fetch(base64Data);
+                const blob = await res.blob();
+                const file = new File([blob], filename, { type: 'application/pdf' });
+
+                if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                    await navigator.share({
+                        files: [file],
+                        title: 'Nexora Document Share',
+                        text: 'Nexora App එකෙන් සාදන ලද PDF ගොනුවකි.'
+                    });
+                } else {
+                    alert("ඔබගේ දුරකථනය මෙම PDF Share පහසුකමට සපයන්නේ නැත.");
+                }
+            } catch (error) {
+                console.error("PDF Sharing failed", error);
+            }
         }
     </script>
 </body>
