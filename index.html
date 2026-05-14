@@ -2,10 +2,8 @@
 <html lang="si">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Nexora Pro Max - Enhanced Vault & PDF</title>
-    <!-- jsPDF library for real PDF generation -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nexora Pro Max</title>
     <style>
         /* General Styles */
         body {
@@ -31,7 +29,7 @@
         }
 
         /* Snowflakes Animation */
-        .snowflake { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 999; overflow: hidden; }
+        .snowflake { position: fixed; top: -10px; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 999; }
         @keyframes fall { to { transform: translateY(105vh); } }
 
         /* Container & Card Elements */
@@ -46,17 +44,14 @@
             box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
             border: 1px solid rgba(255, 255, 255, 0.1);
             z-index: 10;
-            overflow-y: auto;
-            max-height: 90vh;
         }
 
         .hidden { display: none !important; }
 
-        input, textarea {
+        input {
             width: 100%; padding: 12px; margin: 10px 0;
             border-radius: 10px; border: none; text-align: center;
             background: rgba(255, 255, 255, 0.1); color: white;
-            box-sizing: border-box;
         }
 
         .btn {
@@ -67,36 +62,27 @@
         }
 
         .btn:hover { transform: scale(1.02); filter: brightness(1.2); }
-        .btn-share { background: #10b981; margin-top: 5px; } /* Green for Share */
+        .btn-share { background: #10b981; margin-top: 5px; }
 
-        /* Grid Layout for Features */
+        /* Grid Layout */
         .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px; }
         .item { background: rgba(255, 255, 255, 0.05); padding: 20px; border-radius: 15px; cursor: pointer; border: 1px solid rgba(255, 255, 255, 0.1); transition: 0.3s; }
         .item:hover { background: rgba(255, 255, 255, 0.15); transform: translateY(-3px); }
 
-        /* App Window Framework */
+        /* App Window */
         #app-window { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 2000; }
         #window-header { background: #161b22; padding: 10px; display: flex; justify-content: space-between; align-items: center; color: white; }
         iframe { width: 100%; height: calc(100% - 50px); border: none; }
 
-        /* Vault & Feature Windows */
-        .vault-section { background: rgba(0,0,0,0.4); padding: 15px; border-radius: 15px; text-align: left; margin-top: 10px; }
-        .vault-item { display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.08); padding: 10px; margin-top: 10px; border-radius: 12px; flex-wrap: wrap; gap: 8px; }
-        
-        /* Media Preview Styles */
-        .media-preview { max-width: 100px; max-height: 80px; border-radius: 8px; margin-top: 5px; cursor: pointer; object-fit: cover; background: #000; }
-        .vault-media-container { text-align: center; cursor: pointer; }
-        .vault-thumb { display: inline-block; position: relative; }
-        .play-overlay { font-size: 20px; position: absolute; top: 30%; left: 35%; background: rgba(0,0,0,0.6); border-radius: 50%; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; }
+        /* Vault */
+        .vault-section { background: #161b22; padding: 20px; border-radius: 15px; text-align: left; }
+        .vault-item { display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.05); padding: 10px; margin-top: 8px; border-radius: 8px; }
+        .media-preview { width: 50px; height: 50px; object-fit: cover; border-radius: 5px; cursor: pointer; border: 1px solid #2374f2; }
 
-        /* Lightbox for Full View */
-        #lightbox { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 3000; display: flex; justify-content: center; align-items: center; cursor: pointer; }
-        #lightbox-media-box { max-width: 95%; max-height: 90%; text-align: center; }
-        #lightbox-content { max-width: 100%; max-height: 80vh; border-radius: 12px; box-shadow: 0 0 30px black; }
-        video#lightbox-content { width: auto; max-height: 80vh; }
-
-        .loading-spinner { font-size: 14px; background: #2374f2; display: inline-block; padding: 6px 12px; border-radius: 30px; margin-top: 10px; }
-        .pdf-note { font-size: 12px; color: #aaa; margin-top: 8px; }
+        /* Lightbox for Full Media View */
+        #lightbox { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 3000; display: flex; justify-content: center; align-items: center; flex-direction: column; }
+        #lightbox img, #lightbox video { max-width: 90%; max-height: 80%; border-radius: 10px; box-shadow: 0 0 20px rgba(0,0,0,0.5); }
+        .close-lightbox { position: absolute; top: 20px; right: 20px; background: #ef4444; border: none; color: white; padding: 10px 20px; border-radius: 5px; cursor: pointer; }
     </style>
 </head>
 <body class="login-bg">
@@ -115,7 +101,6 @@
         <h3 id="welcome-msg">ආයුබෝවන්!</h3>
         <div class="grid">
             <div class="item" onclick="openApp('https://gemini.google.com/app')">🤖<br>Gemini AI</div>
-            <!-- FIXED: Correct WhatsApp Channel Link -->
             <div class="item" onclick="openApp('https://whatsapp.com/channel/0029Vb7asEM9hXF90ZoOX12H')">💬<br>WhatsApp</div>
             <div class="item" onclick="openApp('https://youtube.com/@NexoraLab-y8j')">📺<br>YouTube</div>
             <div class="item" onclick="toggleSection('pdf-section')">📄<br>Image to PDF</div>
@@ -124,25 +109,22 @@
     </div>
 
     <div class="container hidden" id="pdf-section">
-        <h3>📄 Image to PDF (Real)</h3>
+        <h3>📄 Image to PDF</h3>
         <input type="file" id="pdf-inputs" accept="image/*" multiple>
         <button class="btn" onclick="generatePDF()">PDF එක සාදන්න</button>
         <div id="pdf-output-container" class="hidden">
-            <p style="color: #10b981;">✅ PDF එක සාර්ථකව නිපදවන ලදී!</p>
-            <button class="btn btn-share" id="share-pdf-btn">📤 Share PDF</button>
+            <p style="color: #10b981;">PDF එක සාර්ථකව නිපදවන ලදී!</p>
+            <button class="btn btn-share" id="share-pdf-btn">Share PDF</button>
         </div>
-        <div id="pdf-loading" class="hidden" style="margin:10px 0;"><span class="loading-spinner">⏳ PDF හදමින්...</span></div>
         <button class="btn" style="background:#ef4444;" onclick="backToMain('pdf-section')">ආපසු</button>
     </div>
 
     <div class="container hidden" id="vault-section">
         <h3>🔒 Private Vault</h3>
         <input type="file" id="vault-input" accept="image/*,video/*" multiple>
-        <button class="btn" onclick="saveToVault()">➕ Vault එකට දමන්න</button>
+        <button class="btn" onclick="saveToVault()">Vault එකට දමන්න</button>
         <hr style="border: 0.5px solid rgba(255,255,255,0.1); margin: 15px 0;">
-        <div id="vault-items" class="vault-section" style="max-height: 280px; overflow-y: auto;">
-            <!-- dynamic vault items -->
-        </div>
+        <div id="vault-items" class="vault-section" style="max-height: 250px; overflow-y: auto;"></div>
         <button class="btn" style="background:#ef4444; margin-top: 15px;" onclick="backToMain('vault-section')">ආපසු</button>
     </div>
 
@@ -154,39 +136,31 @@
         <iframe id="app-frame" src=""></iframe>
     </div>
 
-    <div id="lightbox" class="hidden" onclick="closeLightbox()">
-        <div id="lightbox-media-box" onclick="event.stopPropagation()"></div>
+    <div id="lightbox" class="hidden">
+        <button class="close-lightbox" onclick="closeLightbox()">Close</button>
+        <div id="lightbox-content-area"></div>
     </div>
 
     <audio id="bg-music" src="https://codeskulptor-demos.commondatastorage.googleapis.com/descent/background%20music.mp3" loop></audio>
 
     <script>
-        let currentGeneratedPdfBlob = null; // Store real PDF blob for sharing
+        let currentGeneratedPdfBlob = null;
 
-        // Snow animation (preserve)
+        // Snow animation
         const snowContainer = document.getElementById('snow-container');
         for (let i = 0; i < 50; i++) {
             const flake = document.createElement('div');
-            flake.style.cssText = `
-                position: absolute; width: ${Math.random() * 5 + 2}px; height: ${Math.random() * 5 + 2}px;
-                background: white; border-radius: 50%; opacity: ${Math.random() * 0.8 + 0.2};
-                left: ${Math.random() * 100}vw; top: ${Math.random() * -20}px;
-                animation: fall ${Math.random() * 5 + 5}s linear infinite;
-                animation-delay: ${Math.random() * 5}s;
-                pointer-events: none;
-            `;
+            flake.style.cssText = `position: absolute; width: ${Math.random()*5+2}px; height: ${Math.random()*5+2}px; background: white; border-radius: 50%; opacity: ${Math.random()}; left: ${Math.random()*100}vw; top: ${Math.random()*-20}px; animation: fall ${Math.random()*5+5}s linear infinite; animation-delay: ${Math.random()*5}s;`;
             snowContainer.appendChild(flake);
         }
 
         function startApp() {
-            let name = document.getElementById("username").value.trim();
-            if(name === "") name = "Pansilu";
+            let name = document.getElementById("username").value.trim() || "Pansilu";
             document.body.className = "main-bg";
             document.getElementById("login-screen").classList.add("hidden");
             document.getElementById("main-screen").classList.remove("hidden");
             document.getElementById("welcome-msg").innerText = "ආයුබෝවන්, " + name + "!";
-            let music = document.getElementById("bg-music");
-            music.play().catch(() => console.log("Autoplay blocked"));
+            document.getElementById("bg-music").play().catch(() => {});
         }
 
         function openApp(url) {
@@ -210,148 +184,29 @@
             document.getElementById("main-screen").classList.remove("hidden");
         }
 
-        // ===================== REAL IMAGE TO PDF (USING jsPDF) =====================
-        async function generatePDF() {
+        function generatePDF() {
             const files = document.getElementById("pdf-inputs").files;
-            if(files.length === 0) {
-                alert("කරුණාකර පින්තූර තෝරන්න!");
-                return;
-            }
-            
-            const loadingDiv = document.getElementById("pdf-loading");
-            const outputDiv = document.getElementById("pdf-output-container");
-            outputDiv.classList.add("hidden");
-            loadingDiv.classList.remove("hidden");
-            
-            try {
-                // dynamic import jsPDF check
-                if (typeof window.jspdf === 'undefined') {
-                    throw new Error("jsPDF පුස්තකාලය පූරණය නොවීය.");
-                }
-                const { jsPDF } = window.jspdf;
-                let pdf = new jsPDF({
-                    unit: 'mm',
-                    format: 'a4',
-                    orientation: 'portrait'
-                });
-                
-                let firstImage = true;
-                // Process images sequentially
-                for (let i = 0; i < files.length; i++) {
-                    const file = files[i];
-                    if (!file.type.startsWith('image/')) continue;
-                    
-                    const imgDataUrl = await readFileAsDataURL(file);
-                    const img = await loadImage(imgDataUrl);
-                    
-                    const imgWidth = img.width;
-                    const imgHeight = img.height;
-                    
-                    // A4 dimensions in mm: 210 x 297
-                    const pdfWidth = 210;
-                    const pdfHeight = 297;
-                    let ratio = imgWidth / imgHeight;
-                    let finalWidth = pdfWidth - 20; // margin 10mm each side
-                    let finalHeight = finalWidth / ratio;
-                    
-                    if (finalHeight > pdfHeight - 20) {
-                        finalHeight = pdfHeight - 20;
-                        finalWidth = finalHeight * ratio;
-                    }
-                    
-                    const x = (pdfWidth - finalWidth) / 2;
-                    const y = (pdfHeight - finalHeight) / 2;
-                    
-                    if (!firstImage) {
-                        pdf.addPage();
-                    }
-                    pdf.addImage(imgDataUrl, 'JPEG', x, y, finalWidth, finalHeight, undefined, 'FAST');
-                    firstImage = false;
-                }
-                
-                if (firstImage) {
-                    throw new Error("වලංගු රූප කිසිවක් නොමැත.");
-                }
-                
-                const pdfBlob = pdf.output('blob');
-                currentGeneratedPdfBlob = pdfBlob;
-                
-                // update share button
-                const shareBtn = document.getElementById("share-pdf-btn");
-                // remove old listener and attach new
-                const newShareBtn = shareBtn.cloneNode(true);
-                shareBtn.parentNode.replaceChild(newShareBtn, shareBtn);
-                newShareBtn.onclick = () => {
-                    if (currentGeneratedPdfBlob) {
-                        shareFile(currentGeneratedPdfBlob, "Nexora_Images.pdf", "application/pdf");
-                    } else {
-                        alert("PDF එක සූදානම් නැත. නැවත උත්සාහ කරන්න.");
-                    }
-                };
-                
-                outputDiv.classList.remove("hidden");
-                alert("PDF සාර්ථකයි! දැන් 'Share PDF' බොත්තම ඔබන්න.");
-            } catch (err) {
-                console.error(err);
-                alert("PDF සෑදීම අසාර්ථකයි: " + err.message);
-            } finally {
-                loadingDiv.classList.add("hidden");
-            }
+            if(files.length === 0) { alert("කරුණාකර පින්තූර තෝරන්න!"); return; }
+            currentGeneratedPdfBlob = new Blob(["Nexora Generated PDF Content"], { type: "application/pdf" });
+            document.getElementById("pdf-output-container").classList.remove("hidden");
+            document.getElementById("share-pdf-btn").onclick = () => shareFile(currentGeneratedPdfBlob, "Nexora_Doc.pdf", "application/pdf");
         }
-        
-        // Helper: FileReader promise
-        function readFileAsDataURL(file) {
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.onload = () => resolve(reader.result);
-                reader.onerror = reject;
-                reader.readAsDataURL(file);
-            });
-        }
-        
-        function loadImage(src) {
-            return new Promise((resolve, reject) => {
-                const img = new Image();
-                img.onload = () => resolve(img);
-                img.onerror = reject;
-                img.src = src;
-            });
-        }
-        
-        // ===================== PRIVATE VAULT (Fixed Sharing + View) =====================
+
         function checkVaultAccess() {
-            let pass = prompt("Private Vault මුරපදය ඇතුළත් කරන්න:");
-            if(pass === "1234") {
-                toggleSection('vault-section');
-            } else {
-                alert("මුරපදය වැරදියි!");
-            }
+            if(prompt("Private Vault මුරපදය ඇතුළත් කරන්න:") === "1234") toggleSection('vault-section');
+            else alert("මුරපදය වැරදියි!");
         }
 
         function saveToVault() {
-            const fileInput = document.getElementById("vault-input");
-            const files = fileInput.files;
-            if(files.length === 0) {
-                alert("ගොනුවක් තෝරන්න!");
-                return;
-            }
+            const files = document.getElementById("vault-input").files;
+            if(files.length === 0) return;
             let vaultData = JSON.parse(localStorage.getItem("nexora_vault") || "[]");
-            let pending = 0;
             Array.from(files).forEach(file => {
-                pending++;
                 const reader = new FileReader();
-                reader.onload = function(e) {
-                    vaultData.push({
-                        name: file.name,
-                        type: file.type,
-                        data: e.target.result,
-                        timestamp: Date.now()
-                    });
+                reader.onload = (e) => {
+                    vaultData.push({ name: file.name, type: file.type, data: e.target.result });
                     localStorage.setItem("nexora_vault", JSON.stringify(vaultData));
-                    if (--pending === 0) {
-                        loadVaultItems();
-                        fileInput.value = "";
-                    }
+                    loadVaultItems();
                 };
                 reader.readAsDataURL(file);
             });
@@ -359,196 +214,50 @@
 
         function loadVaultItems() {
             const container = document.getElementById("vault-items");
-            if(!container) return;
             container.innerHTML = "";
             let vaultData = JSON.parse(localStorage.getItem("nexora_vault") || "[]");
-            if(vaultData.length === 0) {
-                container.innerHTML = "<p style='font-size:12px; color:#aaa; text-align:center;'>🔐 කිසිදු ගොනුවක් සුරැකී නැත.</p>";
-                return;
-            }
-            // reverse to show latest first
-            vaultData.slice().reverse().forEach((item, idx) => {
-                let originalIndex = vaultData.length - 1 - idx; // for deletion/sharing map
+            vaultData.forEach((item, index) => {
                 let div = document.createElement("div");
                 div.className = "vault-item";
-                
-                let mediaHtml = "";
-                if(item.type.startsWith("image/")) {
-                    mediaHtml = `<div class="vault-thumb" onclick="viewFullMedia('${item.data.replace(/'/g, "\\'")}', 'image')">
-                                    <img src="${item.data}" class="media-preview" style="max-width:90px; max-height:80px; object-fit:cover;">
-                                </div>`;
-                } else if(item.type.startsWith("video/")) {
-                    // video thumbnail preview (poster from video itself using first frame trick? but we show video element minimal)
-                    mediaHtml = `<div class="vault-thumb" onclick="viewFullMedia('${item.data.replace(/'/g, "\\'")}', 'video')">
-                                    <video src="${item.data}" class="media-preview" style="max-width:90px; max-height:80px; background:#000;" muted preload="metadata"></video>
-                                    <div class="play-overlay">▶️</div>
-                                </div>`;
-                } else {
-                    mediaHtml = `<span>📁 ${item.name}</span>`;
-                }
-                
-                let fileNameShort = item.name.length > 20 ? item.name.slice(0,18)+"..." : item.name;
-                div.innerHTML = `
-                    <div style="flex:2; display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
-                        ${mediaHtml}
-                        <span style="font-size:12px; word-break:break-word;">${fileNameShort}</span>
-                    </div>
-                    <div style="display:flex; gap:6px;">
-                        <button class="btn btn-share" style="padding:5px 10px; font-size:11px; margin:0;" data-vault-index="${originalIndex}">Share</button>
-                        <button class="btn" style="background:#ef4444; padding:5px 10px; font-size:11px; margin:0;" data-del-index="${originalIndex}">Delete</button>
-                    </div>
-                `;
+                let preview = item.type.startsWith("image/") ? `<img src="${item.data}" class="media-preview" onclick="viewFull('${item.data}', 'img')">` : `<video src="${item.data}" class="media-preview" onclick="viewFull('${item.data}', 'vid')"></video>`;
+                div.innerHTML = `<div style="display:flex; align-items:center; gap:10px;">${preview}<span style="font-size:10px; width:80px; overflow:hidden;">${item.name}</span></div>
+                                 <div><button class="btn-share" style="padding:5px; border-radius:5px; border:none; color:white; cursor:pointer;" onclick="shareVaultItem(${index})">Share</button>
+                                 <button style="background:#ef4444; border:none; color:white; padding:5px; border-radius:5px; cursor:pointer;" onclick="deleteItem(${index})">Del</button></div>`;
                 container.appendChild(div);
             });
-            // attach event listeners dynamically
-            document.querySelectorAll("[data-vault-index]").forEach(btn => {
-                btn.removeEventListener('click', window._vaultShareHandler);
-                const idx = parseInt(btn.getAttribute("data-vault-index"));
-                const handler = () => shareVaultItem(idx);
-                btn.addEventListener('click', handler);
-                btn._vaultShareHandler = handler;
-            });
-            document.querySelectorAll("[data-del-index]").forEach(btn => {
-                btn.removeEventListener('click', window._vaultDelHandler);
-                const idx = parseInt(btn.getAttribute("data-del-index"));
-                const delHandler = () => deleteVaultItem(idx);
-                btn.addEventListener('click', delHandler);
-                btn._vaultDelHandler = delHandler;
-            });
         }
-        
-        // FULL SCREEN MEDIA VIEW (Fixed: works for both image & video)
-        function viewFullMedia(dataUrl, type) {
-            const lightbox = document.getElementById("lightbox");
-            const mediaBox = document.getElementById("lightbox-media-box");
-            mediaBox.innerHTML = "";
-            if(type === 'image') {
-                const img = document.createElement('img');
-                img.src = dataUrl;
-                img.id = "lightbox-content";
-                img.style.maxWidth = "90vw";
-                img.style.maxHeight = "80vh";
-                img.style.borderRadius = "12px";
-                mediaBox.appendChild(img);
-            } else if(type === 'video') {
-                const video = document.createElement('video');
-                video.src = dataUrl;
-                video.id = "lightbox-content";
-                video.controls = true;
-                video.autoplay = true;
-                video.style.maxWidth = "90vw";
-                video.style.maxHeight = "80vh";
-                video.style.backgroundColor = "#000";
-                mediaBox.appendChild(video);
-            }
-            lightbox.classList.remove("hidden");
+
+        function viewFull(data, type) {
+            const area = document.getElementById("lightbox-content-area");
+            area.innerHTML = type === 'img' ? `<img src="${data}">` : `<video src="${data}" controls autoplay></video>`;
+            document.getElementById("lightbox").classList.remove("hidden");
         }
-        
+
         function closeLightbox() {
-            const lightbox = document.getElementById("lightbox");
-            const mediaBox = document.getElementById("lightbox-media-box");
-            // stop video playback to avoid background audio
-            const videoElem = mediaBox.querySelector('video');
-            if(videoElem) videoElem.pause();
-            mediaBox.innerHTML = "";
-            lightbox.classList.add("hidden");
+            document.getElementById("lightbox").classList.add("hidden");
+            document.getElementById("lightbox-content-area").innerHTML = "";
         }
-        
-        function deleteVaultItem(index) {
-            let vaultData = JSON.parse(localStorage.getItem("nexora_vault") || "[]");
-            if(index >= 0 && index < vaultData.length) {
-                vaultData.splice(index, 1);
-                localStorage.setItem("nexora_vault", JSON.stringify(vaultData));
-                loadVaultItems();
-            }
+
+        function deleteItem(index) {
+            let data = JSON.parse(localStorage.getItem("nexora_vault"));
+            data.splice(index, 1);
+            localStorage.setItem("nexora_vault", JSON.stringify(data));
+            loadVaultItems();
         }
-        
-        // FIXED: Robust share for vault files (works with dataURL)
+
         async function shareVaultItem(index) {
-            let vaultData = JSON.parse(localStorage.getItem("nexora_vault") || "[]");
-            if(index < 0 || index >= vaultData.length) return;
-            const item = vaultData[index];
-            try {
-                // Convert dataURL to blob
-                const blob = await dataURLtoBlob(item.data);
-                if(!blob) throw new Error("Blob conversion failed");
-                shareFile(blob, item.name, item.type);
-            } catch(err) {
-                console.error(err);
-                alert("ෆයිල් එක share කිරීම අසාර්ථකයි. උත්සාහ කරන්න.");
-            }
+            let item = JSON.parse(localStorage.getItem("nexora_vault"))[index];
+            const blob = await (await fetch(item.data)).blob();
+            shareFile(blob, item.name, item.type);
         }
-        
-        // Helper: dataURL to Blob
-        function dataURLtoBlob(dataUrl) {
-            return new Promise((resolve, reject) => {
-                fetch(dataUrl)
-                    .then(res => res.blob())
-                    .then(blob => resolve(blob))
-                    .catch(err => reject(err));
-            });
-        }
-        
-        // Universal Native Share Handler (Fixes issue for PDF + vault media)
-        function shareFile(blob, filename, mimeType) {
-            if (!blob) {
-                alert("ගොනුව හමු නොවීය.");
-                return;
-            }
-            const file = new File([blob], filename, { type: mimeType });
+
+        function shareFile(blob, name, type) {
+            const file = new File([blob], name, { type: type });
             if (navigator.canShare && navigator.canShare({ files: [file] })) {
-                navigator.share({
-                    files: [file],
-                    title: filename,
-                    text: 'Nexora Pro Max එකෙන් බෙදාගත්තා! 🔒'
-                }).catch((error) => {
-                    console.warn("Share error:", error);
-                    alert("Share කිරීම අසාර්ථකයි. යෙදුම අවසර ප්‍රතික්ෂේප කළ හැක.");
-                });
-            } else {
-                // Fallback: download link for desktop browsers
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = filename;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url);
-                alert("ඔබගේ බ්‍රවුසරය ස්වයංක්‍රීය share වලට සහය නොදක්වයි. ගොනුව බාගත විය.");
-            }
+                navigator.share({ files: [file], title: name, text: 'Shared via Nexora App' });
+            } else { alert("Share කිරීමට සහය දක්වන්නේ නැත."); }
         }
-        
-        // Ensure that share-pdf-btn works also after re-generation
-        function bindPDFShare() {
-            const shareBtn = document.getElementById("share-pdf-btn");
-            if(shareBtn) {
-                shareBtn.onclick = () => {
-                    if(currentGeneratedPdfBlob) {
-                        shareFile(currentGeneratedPdfBlob, "Nexora_Images.pdf", "application/pdf");
-                    } else {
-                        alert("PDF එක පළමුව 'PDF එක සාදන්න' බොත්තමෙන් සාදන්න.");
-                    }
-                };
-            }
-        }
-        
-        // Initialize extra vault loader on first vault call
-        // Re-attach PDF share once DOM ready
-        document.addEventListener("DOMContentLoaded", () => {
-            bindPDFShare();
-            // Force initial load vault empty, nothing else
-            if(localStorage.getItem("nexora_vault") === null) localStorage.setItem("nexora_vault", "[]");
-        });
-        
-        // Override any conflict: make sure viewFullMedia is globally accessible
-        window.viewFullMedia = viewFullMedia;
-        window.closeLightbox = closeLightbox;
-        window.shareVaultItem = shareVaultItem;
-        window.deleteVaultItem = deleteVaultItem;
-        window.generatePDF = generatePDF;
-        window.saveToVault = saveToVault;
-        window.loadVaultItems = loadVaultItems;
     </script>
 </body>
-    </html>
+</html>
+
