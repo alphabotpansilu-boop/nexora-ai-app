@@ -5,141 +5,195 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Nexora Pro Max</title>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #0d1117; color: white; margin: 0; text-align: center; }
-        .container { padding: 20px; max-width: 500px; margin: auto; }
-        h2 { color: #58a6ff; }
-        .login-box { background: #161b22; padding: 30px; border-radius: 20px; border: 1px solid #30363d; margin-top: 50px; }
-        input, textarea { width: 85%; padding: 12px; margin: 10px 0; border-radius: 10px; border: 1px solid #30363d; background: #0d1117; color: white; }
-        .btn { background: #238636; color: white; padding: 15px; border: none; border-radius: 10px; width: 100%; cursor: pointer; font-weight: bold; font-size: 16px; transition: 0.3s; }
-        .btn:hover { background: #2ea043; transform: scale(1.02); }
-        
-        #main-ui, #vault-ui, #news-ui, #app-window { display: none; }
-        
-        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; }
-        .item { background: #161b22; padding: 20px; border-radius: 15px; border: 1px solid #30363d; cursor: pointer; transition: 0.3s; }
-        .item:hover { border-color: #58a6ff; background: #1f242c; }
+        /* General Styles */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            color: white;
+            transition: background 0.5s;
+        }
 
-        /* Browser Frame Style */
-        #app-window { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0d1117; z-index: 2000; }
-        .win-header { background: #161b22; padding: 10px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #30363d; }
-        iframe { width: 100%; height: calc(100% - 55px); border: none; background: white; }
+        /* Backgrounds */
+        .login-bg { background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); }
+        .main-bg { background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%); }
+
+        /* Snow Animation */
+        .snow-container {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: 999;
+        }
+        .snowflake {
+            position: absolute;
+            top: -10px;
+            color: white;
+            font-size: 1em;
+            user-select: none;
+            animation: fall linear infinite;
+        }
+        @keyframes fall {
+            to { transform: translateY(105vh); }
+        }
+
+        /* Container & Cards */
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 25px;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.1);
+            z-index: 10;
+        }
+
+        input, button {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border-radius: 10px;
+            border: none;
+            outline: none;
+        }
+        input { background: rgba(255,255,255,0.2); color: white; text-align: center; }
+        button { background: #007bff; color: white; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        button:hover { background: #0056b3; transform: scale(1.02); }
+
+        .hidden { display: none; }
+
+        /* Grid for features */
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; }
+        .grid-item {
+            background: rgba(255,255,255,0.15);
+            padding: 15px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 0.9em;
+        }
+
+        /* Vault & News Styles */
+        .vault-section, .news-section {
+            background: #161b22;
+            padding: 15px;
+            border-radius: 15px;
+            margin-top: 10px;
+            text-align: left;
+        }
+        .news-img { width: 100%; border-radius: 10px; margin-bottom: 10px; }
     </style>
 </head>
-<body>
+<body class="login-bg">
 
-    <audio id="bgMusic" loop>
-        <source src="parano.mp3" type="audio/mpeg">
-    </audio>
+    <div class="snow-container" id="snow"></div>
 
     <div id="login-screen" class="container">
-        <div class="login-box">
-            <h2>Nexora Pro Max</h2>
-            <p>ඇප් එකට ඇතුළු වීමට ඔබේ නම ලියන්න</p>
-            <input type="text" id="uname" placeholder="ඔබේ නම මෙතන ලියන්න...">
-            <button class="btn" onclick="startApp()">START APP</button>
-        </div>
+        <h2>Nexora Pro</h2>
+        <p>ඇප් එකට ඇතුළු වීමට නම ලියන්න</p>
+        <input type="text" id="uname" placeholder="ඔබේ නම...">
+        <button onclick="startApp()">START APP</button>
     </div>
 
-    <div id="main-ui" class="container">
-        <h3>ආයුබෝවන්, <span id="user-display" style="color:#58a6ff;"></span>!</h3>
-        <img src="profile.jpg" style="width:100%; border-radius:15px; border:1px solid #30363d;" alt="Banner">
-
+    <div id="main-screen" class="container hidden">
+        <h3 id="welcome-msg">ආයුබෝවන්!</h3>
+        
         <div class="grid">
-            <div class="item" onclick="openInternal('https://gemini.google.com/app')">🤖 Gemini AI</div>
-            <div class="item" onclick="openInternal('https://www.ilovepdf.com/jpg_to_pdf')">📄 PDF Tool</div>
-            <div class="item" onclick="openInternal('https://www.y2mate.com')">🎵 Download Songs</div>
-            <div class="item" onclick="showVault()">🔒 Private Vault</div>
-            <div class="item" onclick="showNews()" style="grid-column: span 2; background: #21262d;">📰 Daily Tech News</div>
+            <div class="grid-item" onclick="openGemini()">🤖 Gemini AI</div>
+            <div class="grid-item" onclick="showSection('vault')">🔒 Private Vault</div>
+            <div class="grid-item" onclick="window.open('https://youtube.com/@NexoraLab')">📺 YouTube</div>
+            <div class="grid-item" onclick="window.open('https://whatsapp.com/channel/0029Va62v2890x2z')">💬 WhatsApp</div>
         </div>
 
-        <button class="btn" style="background:#25d366; margin-top:20px;" onclick="window.open('https://whatsapp.com/channel/0029Vb7asEM9hXF90ZoOX12H')">WhatsApp Channel</button>
-        <button class="btn" style="background:#ff0000; margin-top:10px;" onclick="window.open('https://youtube.com/@NexoraLab-y8j')">YouTube Channel</button>
+        <button onclick="showSection('news')" style="background: #28a745;">📰 Daily Tech News</button>
     </div>
 
-    <div id="app-window">
-        <div class="win-header">
-            <span style="font-size:14px;">Nexora Secure Browser</span>
-            <button onclick="closeInternal()" style="background:#da3633; color:white; border:none; padding:5px 15px; border-radius:5px; cursor:pointer;">Back</button>
+    <div id="vault-section" class="container hidden">
+        <h3>🔒 Private Vault</h3>
+        <div class="vault-section">
+            <p>📝 Code Safe</p>
+            <textarea id="code-input" style="width:90%; height:60px; border-radius:5px; padding:5px;" placeholder="ඔබේ කේතයන් මෙහි සුරකින්න..."></textarea>
+            <button onclick="saveCode()" style="padding:5px; font-size:0.8em;">Save Code</button>
         </div>
-        <iframe id="app-frame" src=""></iframe>
-    </div>
-
-    <div id="vault-ui" class="container">
-        <h3>Private Vault 🔒</h3>
-        <textarea id="vault-input" placeholder="ඔබේ රහස් නෝට්ස් මෙතන ලියන්න..."></textarea>
-        <button class="btn" onclick="saveNote()">Save Secret Note</button>
-        <button class="btn" style="background:#30363d; margin-top:10px;" onclick="hideSection('vault-ui')">Back</button>
-        <div id="saved-note-display" style="margin-top:20px; padding:10px; background:#161b22; border-radius:10px; text-align:left; border: 1px dashed #58a6ff;"></div>
-    </div>
-
-    <div id="news-ui" class="container">
-        <h3>Daily Tech News 📰</h3>
-        <div style="text-align:left; background:#161b22; padding:15px; border-radius:10px;">
-            <p>• Apple සමාගම නව AI විශේෂාංග හඳුන්වා දෙයි.</p>
-            <p>• ලෝකයේ වේගවත්ම පරිගණක චිප් එක නිපදවයි.</p>
-            <p>• රොබෝ තාක්ෂණය වෛද්‍ය ක්ෂේත්‍රයට එක් වෙයි.</p>
+        <div class="vault-section">
+            <p>🖼️ Media Vault</p>
+            <input type="file" id="media-upload" multiple style="font-size:0.8em;">
+            <p style="font-size:0.7em;">ඡායාරූප සහ වීඩියෝ මෙහි තෝරාගන්න.</p>
         </div>
-        <button class="btn" style="background:#30363d; margin-top:20px;" onclick="hideSection('news-ui')">Back</button>
+        <button onclick="goBack()" style="background: #6c757d;">Back</button>
+    </div>
+
+    <div id="news-section" class="container hidden">
+        <h3>📰 Daily Tech News</h3>
+        <div class="news-section">
+            <img src="https://img.freepik.com/free-photo/representation-user-experience-interface-design_23-2150165980.jpg" class="news-img">
+            <p><b>AI තාක්ෂණයේ නවතම පෙරළිය</b></p>
+            <p style="font-size:0.8em;">කෘතිම බුද්ධිය (AI) මගින් දැන් මිනිස් කටහඬ වඩාත් තාත්විකව අනුකරණය කළ හැකි නව මෙවලම් හඳුන්වා දී ඇත.</p>
+        </div>
+        <button onclick="goBack()" style="background: #6c757d;">Back</button>
     </div>
 
     <script>
-        // Start App and Music
+        // Start App
         function startApp() {
-            let name = document.getElementById("uname").value;
+            const name = document.getElementById("uname").value;
             if(name.trim() !== "") {
-                // Music Autoplay Fix
-                let music = document.getElementById("bgMusic");
-                music.load(); 
-                music.play().catch(function(error) {
-                    console.log("Autoplay blocked: " + error);
-                });
-
-                document.getElementById("login-screen").style.display = "none";
-                document.getElementById("main-ui").style.display = "block";
-                document.getElementById("user-display").innerText = name;
+                document.getElementById("login-screen").classList.add("hidden");
+                document.getElementById("main-screen").classList.remove("hidden");
+                document.body.className = "main-bg";
+                document.getElementById("welcome-msg").innerText = "ආයුබෝවන්, " + name + "!";
+                createSnow();
             } else {
                 alert("කරුණාකර නම ඇතුළත් කරන්න!");
             }
         }
 
-        // Internal Browser Functions
-        function openInternal(url) {
-            document.getElementById("app-frame").src = url;
-            document.getElementById("app-window").style.display = "block";
-        }
-
-        function closeInternal() {
-            document.getElementById("app-window").style.display = "none";
-            document.getElementById("app-frame").src = "";
-        }
-
-        // Vault logic
-        function showVault() {
-            let pass = prompt("මුරපදය (Password) ඇතුළත් කරන්න:");
-            if(pass === "1234") {
-                document.getElementById("main-ui").style.display = "none";
-                document.getElementById("vault-ui").style.display = "block";
-                document.getElementById("saved-note-display").innerText = localStorage.getItem("nexora_note") || "තවම සටහන් කිසිවක් නැත.";
-            } else {
-                alert("මුරපදය වැරදියි!");
+        // Snowflakes Creation
+        function createSnow() {
+            const snowContainer = document.getElementById("snow");
+            for (let i = 0; i < 50; i++) {
+                let flake = document.createElement("div");
+                flake.className = "snowflake";
+                flake.innerText = "❄";
+                flake.style.left = Math.random() * 100 + "vw";
+                flake.style.animationDuration = (Math.random() * 3 + 2) + "s";
+                flake.style.opacity = Math.random();
+                snowContainer.appendChild(flake);
             }
         }
 
-        function saveNote() {
-            let note = document.getElementById("vault-input").value;
-            localStorage.setItem("nexora_note", note);
-            document.getElementById("saved-note-display").innerText = note;
-            alert("සාර්ථකව සුරැකුණා!");
+        function openGemini() {
+            window.open("https://gemini.google.com/app", "_blank");
         }
 
-        function showNews() {
-            document.getElementById("main-ui").style.display = "none";
-            document.getElementById("news-ui").style.display = "block";
+        function showSection(id) {
+            document.getElementById("main-screen").classList.add("hidden");
+            document.getElementById(id + "-section").classList.remove("hidden");
         }
 
-        function hideSection(id) {
-            document.getElementById(id).style.display = "none";
-            document.getElementById("main-ui").style.display = "block";
+        function goBack() {
+            document.getElementById("vault-section").classList.add("hidden");
+            document.getElementById("news-section").classList.add("hidden");
+            document.getElementById("main-screen").classList.remove("hidden");
+        }
+
+        function saveCode() {
+            const code = document.getElementById("code-input").value;
+            localStorage.setItem("saved_code", code);
+            alert("කේතය සාර්ථකව සුරැකුණි!");
+        }
+
+        // Load saved code on start
+        window.onload = function() {
+            const saved = localStorage.getItem("saved_code");
+            if(saved) document.getElementById("code-input").value = saved;
         }
     </script>
 </body>
